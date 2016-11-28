@@ -1,0 +1,18 @@
+% THEOREM
+\def\@begintheorem#1#2{\reset@font\rmfamily\list{}%
+  {\leftmargin\z@\rightmargin\leftmargin}\item[]{\bfseries #1\ #2 }}
+\def\@opargbegintheorem#1#2#3{\reset@font\rmfamily\list{}%
+ {\leftmargin\z@\rightmargin\leftmargin}\item[]{\bfseries #1\ #2 (#3) }}
+\def\@endtheorem{\endlist}
+%
+% PROOF
+\def\proof{\reset@font\rmfamily\list{}%
+  {\leftmargin\z@\rightmargin\leftmargin}\item[]{\reset@font\itshape Proof\/}}
+\def\endproof{\hspace*{1em}{\begin{picture}(6.5,6.5)%
+  \put(0,0){\framebox(6.5,6.5){}}\end{picture}}\endlist}
+\@namedef{proof*}{\reset@font\rmfamily\list{}%
+  {\leftmargin\z@\rightmargin\leftmargin}\item[]{\reset@font\itshape Proof\/}}
+\@namedef{endproof*}{\endlist}
+\def\proofbox{\begin{picture}(6.5,6.5)%
+  \put(0,0){\framebox(6.5,6.5){}}\end{picture}}
+%

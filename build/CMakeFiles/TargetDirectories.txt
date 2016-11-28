@@ -1,0 +1,4 @@
+G:/work/CG_Project/build/CMakeFiles/Intersection.dir
+G:/work/CG_Project/build/CMakeFiles/Polygon.dir
+G:/work/CG_Project/build/CMakeFiles/ALL_BUILD.dir
+G:/work/CG_Project/build/CMakeFiles/ZERO_CHECK.dir

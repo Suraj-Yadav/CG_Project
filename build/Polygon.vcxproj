@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{81ADC497-F742-3BD8-B0F6-555CE8697095}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>Polygon</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:\work\CG_Project\build\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Polygon.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Polygon</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:\work\CG_Project\build\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Polygon.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Polygon</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions> /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4503</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DEBUG;QT_XML_LIB;QT_CORE_LIB;QT_SCRIPT_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_SVG_LIB;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;CGAL_USE_CORE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_DEBUG;QT_XML_LIB;QT_CORE_LIB;QT_SCRIPT_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_SVG_LIB;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;CGAL_USE_CORE;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\lib\libmpfr-4.lib;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\lib\libgmp-10.lib;glu32.lib;opengl32.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Xmld.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Scriptd.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5OpenGLd.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Svgd.lib;glu32.lib;opengl32.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Widgetsd.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Guid.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Cored.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/ExtLibs/CGAL-4.9/build/lib;C:/ExtLibs/CGAL-4.9/build/lib/$(Configuration);C:/ExtLibs/boost_1_62_0/lib64-msvc-12.0;C:/ExtLibs/boost_1_62_0/lib64-msvc-12.0/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>G:/work/CG_Project/build/Debug/Polygon.lib</ImportLibrary>
+      <ProgramDataBaseFile>G:/work/CG_Project/build/Debug/Polygon.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions> /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4503</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <FloatingPointModel>Strict</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;NDEBUG;QT_XML_LIB;QT_CORE_LIB;QT_SCRIPT_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_SVG_LIB;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;CGAL_USE_CORE;QT_NO_DEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat></DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;NDEBUG;QT_XML_LIB;QT_CORE_LIB;QT_SCRIPT_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_SVG_LIB;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;CGAL_USE_CORE;QT_NO_DEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>G:\work\CG_Project\..\..\include;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\include;G:\work\CG_Project\build;C:\ExtLibs\CGAL-4.9\build\include;C:\ExtLibs\CGAL-4.9\include;C:\ExtLibs\boost_1_62_0;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtXml;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtCore;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\.\mkspecs\win32-msvc2013;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtScript;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtOpenGL;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtWidgets;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtGui;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\lib\libmpfr-4.lib;C:\ExtLibs\CGAL-4.9\auxiliary\gmp\lib\libgmp-10.lib;glu32.lib;opengl32.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Xml.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Script.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5OpenGL.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Svg.lib;glu32.lib;opengl32.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Widgets.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Gui.lib;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\Qt5Core.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/ExtLibs/CGAL-4.9/build/lib;C:/ExtLibs/CGAL-4.9/build/lib/$(Configuration);C:/ExtLibs/boost_1_62_0/lib64-msvc-12.0;C:/ExtLibs/boost_1_62_0/lib64-msvc-12.0/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>G:/work/CG_Project/build/Release/Polygon.lib</ImportLibrary>
+      <ProgramDataBaseFile>G:/work/CG_Project/build/Release/Polygon.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="G:\work\CG_Project\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule G:/work/CG_Project/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HG:/work/CG_Project -BG:/work/CG_Project/build --check-stamp-file G:\work\CG_Project\build\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:/work/CG_Project/CMakeLists.txt;G:\work\CG_Project\CMakeLists.txt;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeCCompiler.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\ExtLibs\CGAL-4.9\build\CGALConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGALExports.cmake;C:\ExtLibs\CGAL-4.9\build\CGALLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_CoreLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_ImageIOLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_Qt5LibConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QDDSPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QGifPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QICNSPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QICOPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QJpegPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QMinimalIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QOffscreenIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTgaPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTiffPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTuioTouchPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWbmpPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWebpPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWindowsIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsMacros.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5Svg_QSvgIconPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5Svg_QSvgPlugin.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\UseCGAL.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Macros.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_VersionUtils.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Common.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Macros.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_SetupVLD.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_SetupFlags.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_GeneratorSpecificSettings.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_TweakFindBoost.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5ScriptTools\Qt5ScriptToolsConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5ScriptTools\Qt5ScriptToolsConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Xml\Qt5XmlConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Xml\Qt5XmlConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfig.cmake;G:\work\CG_Project\Polygon.qrc;G:\work\CG_Project\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:\work\CG_Project\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule G:/work/CG_Project/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -HG:/work/CG_Project -BG:/work/CG_Project/build --check-stamp-file G:\work\CG_Project\build\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:/work/CG_Project/CMakeLists.txt;G:\work\CG_Project\CMakeLists.txt;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeCCompiler.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeCXXCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;G:\work\CG_Project\build\CMakeFiles\3.7.0\CMakeRCCompiler.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\ExtLibs\CGAL-4.9\build\CGALConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGALExports.cmake;C:\ExtLibs\CGAL-4.9\build\CGALLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_CoreLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_ImageIOLibConfig.cmake;C:\ExtLibs\CGAL-4.9\build\CGAL_Qt5LibConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QDDSPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QGifPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QICNSPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QICOPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QJpegPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QMinimalIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QOffscreenIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTgaPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTiffPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QTuioTouchPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWbmpPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWebpPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5Gui_QWindowsIntegrationPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsConfigExtras.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Widgets\Qt5WidgetsMacros.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5Svg_QSvgIconPlugin.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5Svg_QSvgPlugin.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\UseCGAL.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Macros.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_VersionUtils.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Common.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_Macros.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_SetupVLD.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_SetupFlags.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_GeneratorSpecificSettings.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\CGAL_TweakFindBoost.cmake;C:\ExtLibs\CGAL-4.9\cmake\modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.7\Modules\CMakeParseArguments.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Gui\Qt5GuiConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5ScriptTools\Qt5ScriptToolsConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5ScriptTools\Qt5ScriptToolsConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5\Qt5Config.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Xml\Qt5XmlConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Xml\Qt5XmlConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Script\Qt5ScriptConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5OpenGL\Qt5OpenGLConfig.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfigVersion.cmake;C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\lib\cmake\Qt5Svg\Qt5SvgConfig.cmake;G:\work\CG_Project\Polygon.qrc;G:\work\CG_Project\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:\work\CG_Project\build\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="G:\work\CG_Project\build\CMakeFiles\43a33da1ddb4d5f73423a7aa70637cb2\Polygon.moc.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating Polygon.moc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd G:\work\CG_Project\build
+if %errorlevel% neq 0 goto :cmEnd
+G:
+if %errorlevel% neq 0 goto :cmEnd
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\moc.exe @G:/work/CG_Project/build/Polygon.moc_parameters
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:/work/CG_Project/build/CMakeFiles/43a33da1ddb4d5f73423a7aa70637cb2/Polygon.moc.rule;G:\work\CG_Project\Polygon.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:\work\CG_Project\build\Polygon.moc</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating Polygon.moc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd G:\work\CG_Project\build
+if %errorlevel% neq 0 goto :cmEnd
+G:
+if %errorlevel% neq 0 goto :cmEnd
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\moc.exe @G:/work/CG_Project/build/Polygon.moc_parameters
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:/work/CG_Project/build/CMakeFiles/43a33da1ddb4d5f73423a7aa70637cb2/Polygon.moc.rule;G:\work\CG_Project\Polygon.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:\work\CG_Project\build\Polygon.moc</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="G:\work\CG_Project\Polygon.ui">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating ui_Polygon.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\uic.exe -o G:/work/CG_Project/build/ui_Polygon.h G:/work/CG_Project/Polygon.ui
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:/work/CG_Project/Polygon.ui;G:\work\CG_Project\Polygon.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:\work\CG_Project\build\ui_Polygon.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating ui_Polygon.h</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\uic.exe -o G:/work/CG_Project/build/ui_Polygon.h G:/work/CG_Project/Polygon.ui
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:/work/CG_Project/Polygon.ui;G:\work\CG_Project\Polygon.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:\work\CG_Project\build\ui_Polygon.h</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="G:\work\CG_Project\Polygon.qrc">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generating qrc_Polygon.cpp</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\rcc.exe --name Polygon --output G:/work/CG_Project/build/qrc_Polygon.cpp G:/work/CG_Project/Polygon.qrc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:/work/CG_Project/Polygon.qrc;G:\work\CG_Project\about_Polygon.html;G:\work\CG_Project\about_Polygon.html;G:\work\CG_Project\Polygon.qrc;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">G:\work\CG_Project\build\qrc_Polygon.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generating qrc_Polygon.cpp</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\ExtLibs\Qt5.7.0\5.7\msvc2013_64\bin\rcc.exe --name Polygon --output G:/work/CG_Project/build/qrc_Polygon.cpp G:/work/CG_Project/Polygon.qrc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:/work/CG_Project/Polygon.qrc;G:\work\CG_Project\about_Polygon.html;G:\work\CG_Project\about_Polygon.html;G:\work\CG_Project\Polygon.qrc;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">G:\work\CG_Project\build\qrc_Polygon.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="G:\work\CG_Project\build\ui_Polygon.h" />
+    <ClCompile Include="G:\work\CG_Project\Polygon.cpp"  />
+    <ClCompile Include="G:\work\CG_Project\build\qrc_Polygon.cpp"  />
+    <None Include="G:\work\CG_Project\build\Polygon.moc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="G:/work/CG_Project/build/ZERO_CHECK.vcxproj">
+      <Project>9C752A57-D006-3F9E-A062-34A0F28B322F</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

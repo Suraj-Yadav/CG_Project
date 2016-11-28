@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/cgal/help" >
+    <file alias="about_CGAL.html" >about_Polygon.html</file>
+    <file>about_Polygon.html</file>
+  </qresource>
+</RCC>

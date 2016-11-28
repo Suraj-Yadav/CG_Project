@@ -1,0 +1,16 @@
+-IG:/work/CG_Project/../../include
+-IC:/ExtLibs/CGAL-4.9/auxiliary/gmp/include
+-IC:/ExtLibs/CGAL-4.9/auxiliary/gmp/include
+-IG:/work/CG_Project/build
+-IC:/ExtLibs/CGAL-4.9/build/include
+-IC:/ExtLibs/CGAL-4.9/include
+-IC:/ExtLibs/boost_1_62_0
+-DCGAL_USE_MPFR
+-DCGAL_USE_GMP
+-DBOOST_ALL_DYN_LINK
+-DBOOST_ALL_DYN_LINK
+-DCGAL_USE_CORE
+-DWIN32
+-o
+G:/work/CG_Project/build/Polygon.moc
+G:/work/CG_Project/Polygon.cpp
