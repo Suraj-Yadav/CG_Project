@@ -1,2 +1,2 @@
 # CG_Project
-Final Year project on Compuational Geometry
+Final Year project on Computational Geometry
