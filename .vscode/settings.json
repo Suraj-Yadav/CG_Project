@@ -1,8 +1,0 @@
-// Place your settings in this file to overwrite default and user settings.
-{
-	"C_Cpp.autocomplete": "Default",
-	"clang.cxxflags": [
-		"-IC:\\ExtLibs\\CGAL-4.9\\include",
-		"-std=c++14"
-	]
-}
