@@ -59,6 +59,34 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND AND Qt5_FOUND )
 	# And with CGAL libraries
 	target_link_libraries( Polygon ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
+	# --------------------------------
+	# Demo: EMST
+	#--------------------------------
+	# UI files (Qt Designer files)
+	qt5_wrap_ui( DT_UI_FILES EMST.ui )
+
+	# qrc files (resources files, that contain icons, at least)
+	qt5_add_resources ( CGAL_Qt5_RESOURCE_FILES ./EMST.qrc )
+
+	# use the Qt MOC preprocessor on classes that derives from QObject
+	qt5_generate_moc( EMST.cpp "${CMAKE_CURRENT_BINARY_DIR}/EMST.moc" )
+
+	#	add_library( CGAL SHARED IMPORTED ) 
+	#	SET_PROPERTY(TARGET CGAL PROPERTY IMPORTED_LOCATION ${CGAL_LIBRARY} )
+
+	# The executable itself.
+	add_executable	( EMST EMST.cpp EMST.moc ${DT_UI_FILES} ${DT_RESOURCE_FILES} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES} )
+
+	qt5_use_modules(EMST Xml Script OpenGL Svg)
+
+	add_to_cached_list( CGAL_EXECUTABLE_TARGETS EMST )
+
+
+	# Link with Qt libraries
+	target_link_libraries( EMST ${QT_LIBRARIES} )
+	# And with CGAL libraries
+	target_link_libraries( EMST ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+
 else()
 
 	set(MISSING_DEPENDENCIES "") 

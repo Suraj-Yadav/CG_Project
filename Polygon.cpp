@@ -23,10 +23,11 @@
 
 using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Point2D = Kernel::Point_2;
-using Segment2D=Kernel::Segment_2;
+using Segment2D = Kernel::Segment_2;
 using Line2D = Kernel::Line_2;
 
 // it must be a list for the partition
+
 using Polygon2D = CGAL::Polygon_2<Kernel, std::list<Point2D>>;
 
 class MainWindow : public CGAL::Qt::DemosMainWindow, public Ui::PolygonWindow {
@@ -69,7 +70,7 @@ class MainWindow : public CGAL::Qt::DemosMainWindow, public Ui::PolygonWindow {
 
 MainWindow::MainWindow() : DemosMainWindow() {
 	setupUi(this);
-
+	
 	this->graphicsView->setAcceptDrops(false);
 
 	// Add a GraphicItem for the Polygon2
@@ -191,14 +192,15 @@ void MainWindow::on_actionSavePolygon_triggered() {
 }
 
 void MainWindow::on_actionCreateInputPolygon_toggled(bool checked) {
-  poly.clear();
-  clear();
-  if (checked) {
-	scene.installEventFilter(pi);
-  } else {
-	scene.removeEventFilter(pi);
-  }
-  Q_EMIT(changed());
+	poly.clear();
+	clear();
+	if (checked) {
+		scene.installEventFilter(pi);
+	}
+	else {
+		scene.removeEventFilter(pi);
+	}
+	Q_EMIT(changed());
 }
 
 void MainWindow::on_actionRecenter_triggered() {
@@ -225,7 +227,7 @@ int main(int argc, char **argv) {
 	// See http://doc.qt.io/qt-5/qdir.html#Q_INIT_RESOURCE
 	CGAL_QT_INIT_RESOURCES;
 
-	Q_INIT_RESOURCE(Polygon);	//Use the name of the file Polygon.qrc
+	Q_INIT_RESOURCE(Polygon); //Use the name of the file Polygon.qrc
 
 	MainWindow mainWindow;
 	mainWindow.show();

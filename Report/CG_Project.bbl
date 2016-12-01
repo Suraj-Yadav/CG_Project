@@ -1,0 +1,103 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{Edelsbrunner:2006:SSP:2263365.2270180}
+H.~Edelsbrunner, D.~Kirkpatrick, R.~Seidel,
+  \href{http://dx.doi.org/10.1109/TIT.1983.1056714}{On the shape of a set of
+  points in the plane}, IEEE Trans. Inf. Theor. 29~(4) (2006) 551--559.
+\newblock \href {http://dx.doi.org/10.1109/TIT.1983.1056714}
+  {\path{doi:10.1109/TIT.1983.1056714}}.
+\newline\urlprefix\url{http://dx.doi.org/10.1109/TIT.1983.1056714}
+
+\bibitem{Melkemi:7693802}
+M.~Melkemi, M.~Djebali,
+  \href{http://dx.doi.org/10.1016/s0031-3203(99)00124-7}{{Computing the shape
+  of a planar points set}}, Pattern Recognition 33~(9) (2000) 1423--1436.
+\newblock \href {http://dx.doi.org/10.1016/s0031-3203(99)00124-7}
+  {\path{doi:10.1016/s0031-3203(99)00124-7}}.
+\newline\urlprefix\url{http://dx.doi.org/10.1016/s0031-3203(99)00124-7}
+
+\bibitem{fadili:hal-01123869}
+J.~M. Fadili, M.~Melkemi, A.~Elmoataz,
+  \href{https://hal.archives-ouvertes.fr/hal-01123869}{{Non-convex onion
+  peeling using a shape hull algorithm}}, {Pattern Recognition Letters} 25~(14)
+  (2004) 1577--1585.
+\newblock \href {http://dx.doi.org/10.1016/j.patrec.2004.05.015}
+  {\path{doi:10.1016/j.patrec.2004.05.015}}.
+\newline\urlprefix\url{https://hal.archives-ouvertes.fr/hal-01123869}
+
+\bibitem{Chazelle1057060}
+B.~Chazelle, On the convex layers of a planar set, IEEE Transactions on
+  Information Theory 31~(4) (1985) 509--517.
+\newblock \href {http://dx.doi.org/10.1109/TIT.1985.1057060}
+  {\path{doi:10.1109/TIT.1985.1057060}}.
+
+\bibitem{Chaudhuri:1997:NAC:269777.269779}
+A.~R. Chaudhuri, B.~B. Chaudhuri, S.~K. Parui,
+  \href{http://dx.doi.org/10.1006/cviu.1997.0550}{A novel approach to
+  computation of the shape of a dot pattern and extraction of its perceptual
+  border}, Comput. Vis. Image Underst. 68~(3) (1997) 257--275.
+\newblock \href {http://dx.doi.org/10.1006/cviu.1997.0550}
+  {\path{doi:10.1006/cviu.1997.0550}}.
+\newline\urlprefix\url{http://dx.doi.org/10.1006/cviu.1997.0550}
+
+\bibitem{Harith01}
+H.~Alani, C.~B. Jones, D.~Tudhope, {Voronoi-based region approximation for
+  geographical information retrieval with gazetteers}, International Journal of
+  Geographical Information Science 15~(4) (2001) 287--306.
+
+\bibitem{Avi-04}
+A.~Arampatzis, M.~van Kreveld, I.~Reinbacher, C.~B. Jones, S.~Vaid, P.~Clough,
+  H.~Joho, M.~Sanderson, M.~Benkert, A.~Wolff, {Web-Based Delineation of
+  Imprecise Regions}.
+
+\bibitem{recVoid}
+O.~Şeref, C.~W. Zobel,
+  \href{http://www.sciencedirect.com/science/article/pii/S0031320313002173}{Recursive
+  voids for identifying a nonconvex boundary of a set of points in the plane},
+  Pattern Recognition 46~(12) (2013) 3288 -- 3299.
+\newblock \href
+  {http://dx.doi.org/http://dx.doi.org/10.1016/j.patcog.2013.05.013}
+  {\path{doi:http://dx.doi.org/10.1016/j.patcog.2013.05.013}}.
+\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0031320313002173}
+
+\bibitem{Duckham:2008:EGS:1385702.1385955}
+M.~Duckham, L.~Kulik, M.~Worboys, A.~Galton,
+  \href{http://dx.doi.org/10.1016/j.patcog.2008.03.023}{Efficient generation of
+  simple polygons for characterizing the shape of a set of points in the
+  plane}, Pattern Recogn. 41~(10) (2008) 3224--3236.
+\newblock \href {http://dx.doi.org/10.1016/j.patcog.2008.03.023}
+  {\path{doi:10.1016/j.patcog.2008.03.023}}.
+\newline\urlprefix\url{http://dx.doi.org/10.1016/j.patcog.2008.03.023}
+
+\bibitem{Amenta:2001:PC:376957.376986}
+N.~Amenta, S.~Choi, R.~K. Kolluri,
+  \href{http://doi.acm.org/10.1145/376957.376986}{The power crust}, in:
+  Proceedings of the Sixth ACM Symposium on Solid Modeling and Applications,
+  SMA '01, ACM, New York, NY, USA, 2001, pp. 249--266.
+\newblock \href {http://dx.doi.org/10.1145/376957.376986}
+  {\path{doi:10.1145/376957.376986}}.
+\newline\urlprefix\url{http://doi.acm.org/10.1145/376957.376986}
+
+\bibitem{Peethambaran:2015:RWS:2941001.2941130}
+J.~Peethambaran, R.~Muthuganapathy,
+  \href{http://dx.doi.org/10.1016/j.cad.2014.08.021}{Reconstruction of
+  water-tight surfaces through delaunay sculpting}, Comput. Aided Des. 58~(C)
+  (2015) 62--72.
+\newblock \href {http://dx.doi.org/10.1016/j.cad.2014.08.021}
+  {\path{doi:10.1016/j.cad.2014.08.021}}.
+\newline\urlprefix\url{http://dx.doi.org/10.1016/j.cad.2014.08.021}
+
+\bibitem{Boissonnat:1984:GST:357346.357349}
+J.-D. Boissonnat, \href{http://doi.acm.org/10.1145/357346.357349}{Geometric
+  structures for three-dimensional shape representation}, ACM Trans. Graph.
+  3~(4) (1984) 266--286.
+\newblock \href {http://dx.doi.org/10.1145/357346.357349}
+  {\path{doi:10.1145/357346.357349}}.
+\newline\urlprefix\url{http://doi.acm.org/10.1145/357346.357349}
+
+\end{thebibliography}
