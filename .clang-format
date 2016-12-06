@@ -1,0 +1,23 @@
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBraces: Custom
+ColumnLimit: 0
+DerivePointerAlignment: true
+IndentCaseLabels: true
+IndentWidth: 4
+TabWidth: 4
+Language: Cpp
+UseTab: Always
+NamespaceIndentation: All
+BraceWrapping:   
+  AfterClass:      false
+  AfterControlStatement: false
+  AfterEnum:       false
+  AfterFunction:   false
+  AfterNamespace:  false
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      false
+  BeforeCatch:     true
+  BeforeElse:      true
+  IndentBraces:    false
