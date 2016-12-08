@@ -32,21 +32,21 @@ option(ACTIVATE_CONCURRENT_TRIANGULATION_3
   OFF)
   
 # And add -DCGAL_CONCURRENT_TRIANGULATION_3 if that option is ON
-if( ACTIVATE_CONCURRENT_TRIANGULATION_3 )
-  add_definitions( -DCGAL_CONCURRENT_TRIANGULATION_3 )
-  find_package( TBB REQUIRED )
-else( ACTIVATE_CONCURRENT_TRIANGULATION_3 )
-  option( LINK_WITH_TBB
-    "Link with TBB anyway so we can use TBB timers for profiling"
-    ON)
-  if( LINK_WITH_TBB )
-    find_package( TBB )
-  endif( LINK_WITH_TBB )
-endif()
-
-if( TBB_FOUND )
-  include(${TBB_USE_FILE})
-endif()
+#if( ACTIVATE_CONCURRENT_TRIANGULATION_3 )
+#  add_definitions( -DCGAL_CONCURRENT_TRIANGULATION_3 )
+#  find_package( TBB REQUIRED )
+#else( ACTIVATE_CONCURRENT_TRIANGULATION_3 )
+#  option( LINK_WITH_TBB
+#    "Link with TBB anyway so we can use TBB timers for profiling"
+#    ON)
+#  if( LINK_WITH_TBB )
+#    find_package( TBB )
+#  endif( LINK_WITH_TBB )
+#endif()
+#
+#if( TBB_FOUND )
+#  include(${TBB_USE_FILE})
+#endif()
 
 if ( CGAL_FOUND AND CGAL_Qt5_FOUND AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 
@@ -62,9 +62,11 @@ if ( CGAL_FOUND AND CGAL_Qt5_FOUND AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_
 
   # cpp files
   add_executable  ( T3_demo T3_demo.cpp
-                    MainWindow.cpp Viewer.cpp
-                    PreferenceDlg.cpp
-                    Scene.cpp ${uis} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES})
+                    MainWindow.cpp MainWindow.h 
+					Viewer.cpp Viewer.h
+                    Scene.cpp Scene.h 
+					typedefs.h
+					${uis} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES})
 
   qt5_use_modules(T3_demo Xml Script OpenGL)
   add_to_cached_list( CGAL_EXECUTABLE_TARGETS T3_demo )

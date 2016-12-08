@@ -1,10 +1,11 @@
 #include <fstream>
-#include <unordered_map>
+#include <map>
 
 // CGAL headers
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/squared_distance_2.h>
+#include <CGAL/Union_find.h>
 
 #include <CGAL/point_generators_2.h>
 
@@ -216,6 +217,7 @@ void MainWindow::open(QString fileName) {
 	std::ifstream ifs(qPrintable(fileName));
 
 	dt.clear();
+	mstSegments.clear();
 
 	Kernel::Point_2 p;
 	std::vector<Kernel::Point_2> points;
@@ -225,50 +227,29 @@ void MainWindow::open(QString fileName) {
 		points.push_back(p);
 	}
 	dt.insert(points.begin(), points.end());
+	
+	std::vector<Segment2D> allEdges;
 
-	std::cout << points.size() << "\n";
-
-	points.clear();
-	std::unordered_map<Delaunay::Vertex_handle, unsigned> mapping;
-	using myEdge = std::tuple<Delaunay::Vertex_handle, Delaunay::Vertex_handle, Kernel::FT>;
-
-	std::vector<myEdge> allEdges, mstEdges;
-
-	unsigned index = 0;
+	std::map<Point2D, CGAL::Union_find<Point2D>::handle> mapping;
+	CGAL::Union_find<Point2D> uf;
 
 	for (auto vertItr = dt.finite_vertices_begin(); vertItr != dt.finite_vertices_end(); ++vertItr) {
-		mapping.insert({vertItr->handle(), index++});
-		points.push_back(vertItr->handle()->point());
-		Delaunay::Vertex_circulator start = dt.incident_vertices(vertItr->handle()), temp = start;
-		do {
-			allEdges.push_back(std::make_tuple(
-				vertItr->handle(),
-				temp->handle(),
-				CGAL::squared_distance(vertItr->handle()->point(), temp->handle()->point())));
-			temp++;
-		} while (temp != start);
+		auto p = vertItr->handle()->point();
+		mapping.insert({p, uf.make_set(p)});
 	}
 
-	std::cout << points.size() << "\n";
+	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++)
+		allEdges.push_back(dt.segment(*edgeItr));
+	
+	std::sort(allEdges.begin(),
+			  allEdges.end(),
+			  [](Segment2D & a, Segment2D & b) -> bool { return a.squared_length() < b.squared_length(); });
 
-	std::sort(allEdges.begin(), allEdges.end(),
-			  [](myEdge &a, myEdge &b) -> bool {
-				  return std::get<2>(a) < std::get<2>(b);
-			  });
-
-	UnionFind uf(points.size());
-
-	for (myEdge &e : allEdges) {
-		auto u = std::get<0>(e), v = std::get<1>(e);
-		if (uf.find(mapping[u]) != uf.find(mapping[v])) {
-			uf.Union(uf.find(mapping[u]), uf.find(mapping[v]));
-			mstEdges.push_back(e);
+	for (auto edge : allEdges) {
+		if (!uf.same_set(mapping[edge.start()], mapping[edge.end()])) {
+			mstSegments.push_back(edge);
+			uf.unify_sets(mapping[edge.start()], mapping[edge.end()]);
 		}
-	}
-	mstSegments.clear();
-	for (myEdge &e : mstEdges) {
-		auto u = std::get<0>(e), v = std::get<1>(e);
-		mstSegments.emplace_back(u->point(), v->point());
 	}
 
 	// default cursor

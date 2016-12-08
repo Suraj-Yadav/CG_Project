@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include <string>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent)
 	: CGAL::Qt::DemosMainWindow(parent) {
@@ -43,6 +44,8 @@ void MainWindow::connectActions() {
 					 this->viewer, SLOT(toggleShowDEdge(bool)));
 	QObject::connect(this->actionShow_VEdge, SIGNAL(toggled(bool)),
 					 this->viewer, SLOT(toggleShowVEdge(bool)));
+	QObject::connect(this->actionShow_MST, SIGNAL(toggled(bool)),
+					 this->viewer, SLOT(toggleShowMST(bool)));
 	QObject::connect(this->actionShow_Facet, SIGNAL(toggled(bool)),
 					 this->viewer, SLOT(toggleShowFacet(bool)));
 	QObject::connect(this->actionFlat, SIGNAL(toggled(bool)),

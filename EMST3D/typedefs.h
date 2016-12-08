@@ -3,8 +3,8 @@
 
 #define CGAL_CONCURRENT_TRIANGULATION_3_PROFILING
 
-#include <vector>  //dynamic array
-#include <list>  //linked list
+#include <list>   //linked list
+#include <vector> //dynamic array
 
 // CGAL
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -20,10 +20,10 @@
 typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
 
 // Ddefine field type
-typedef Kernel::FT	FT;
+typedef Kernel::FT FT;
 
-typedef Kernel::Vector_3		Vector_3;
-typedef Kernel::Direction_3		Direction_3;
+typedef Kernel::Vector_3 Vector_3;
+typedef Kernel::Direction_3 Direction_3;
 
 //typedef Kernel::Point_3		Point_3;
 //typedef Kernel::Vector_3	Vector_3;
@@ -47,31 +47,30 @@ typedef Kernel::Direction_3		Direction_3;
  *  (described in page 2494 and page 2495).
  */
 /* add index and color to vertex class */
-template < class GT, class Vb=CGAL::Triangulation_vertex_base_3<GT> >
-class Vertex_base : public Vb
-{
-public:
-  typedef typename Vb::Point	Point;
-  typedef typename Vb::Vertex_handle	Vertex_handle;
-  typedef typename Vb::Cell_handle		Cell_handle;
+template <class GT, class Vb = CGAL::Triangulation_vertex_base_3<GT>>
+class Vertex_base : public Vb {
+  public:
+	typedef typename Vb::Point Point;
+	typedef typename Vb::Vertex_handle Vertex_handle;
+	typedef typename Vb::Cell_handle Cell_handle;
 
-  template < class TDS2 >
-  struct Rebind_TDS {
-    typedef typename Vb::template Rebind_TDS<TDS2>::Other	Vb2;
-    typedef Vertex_base< GT, Vb2 >	Other;
-  };
-  Vertex_base()
-   : m_isSelected(false) {}
-  Vertex_base(const Point& p)
-   : Vb(p), m_isSelected(false) {}
-  Vertex_base(const Point& p, Cell_handle c)
-   : Vb(p, c), m_isSelected(false) {}
+	template <class TDS2>
+	struct Rebind_TDS {
+		typedef typename Vb::template Rebind_TDS<TDS2>::Other Vb2;
+		typedef Vertex_base<GT, Vb2> Other;
+	};
+	Vertex_base()
+		: m_isSelected(false) {}
+	Vertex_base(const Point& p)
+		: Vb(p), m_isSelected(false) {}
+	Vertex_base(const Point& p, Cell_handle c)
+		: Vb(p, c), m_isSelected(false) {}
 
-  inline bool isSeled() const {  return m_isSelected;  }
-  inline void setSeled(bool flag=true) {  m_isSelected = flag;  }
+	inline bool isSeled() const { return m_isSelected; }
+	inline void setSeled(bool flag = true) { m_isSelected = flag; }
 
-private:
-  bool m_isSelected;  // whether it is selected
+  private:
+	bool m_isSelected; // whether it is selected
 };
 
 /*
@@ -87,33 +86,74 @@ private:
  */
 #ifdef CGAL_CONCURRENT_TRIANGULATION_3
 typedef CGAL::Spatial_lock_grid_3<
-  CGAL::Tag_priority_blocking>                        Lock_ds;
-typedef CGAL::Triangulation_data_structure_3< 
-  Vertex_base<Kernel>, 
-  CGAL::Triangulation_ds_cell_base_3<>, 
-  CGAL::Parallel_tag >	                              Tds;
+	CGAL::Tag_priority_blocking>
+	Lock_ds;
+typedef CGAL::Triangulation_data_structure_3<
+	Vertex_base<Kernel>,
+	CGAL::Triangulation_ds_cell_base_3<>,
+	CGAL::Parallel_tag>
+	Tds;
 typedef CGAL::Delaunay_triangulation_3<
-  Kernel, Tds, CGAL::Default, Lock_ds>	              DT3;
+	Kernel, Tds, CGAL::Default, Lock_ds>
+	DT3;
 
 #else
-typedef CGAL::Triangulation_data_structure_3< Vertex_base<Kernel> >	Tds;
+typedef CGAL::Triangulation_data_structure_3<Vertex_base<Kernel>> Tds;
 typedef CGAL::Delaunay_triangulation_3<
-  Kernel, Tds/*, CGAL::Fast_location*/>	                            DT3;
+	Kernel, Tds /*, CGAL::Fast_location*/>
+	DT3;
 #endif
 
-typedef DT3::Object		Object_3;
-typedef DT3::Point		Point_3;
-typedef DT3::Segment	Segment_3;
-typedef DT3::Ray		Ray_3;
-typedef DT3::Triangle	Triangle_3;
+typedef DT3::Object Object_3;
+typedef DT3::Point Point_3;
+typedef DT3::Segment Segment_3;
+typedef DT3::Ray Ray_3;
+typedef DT3::Triangle Triangle_3;
 
-typedef DT3::Vertex_handle	Vertex_handle;
-typedef DT3::Finite_vertices_iterator	vertices_iterator;
-typedef DT3::Edge		Edge;
-typedef DT3::Finite_edges_iterator	edges_iterator;
-typedef DT3::Facet		Facet;
-typedef DT3::Finite_facets_iterator	facets_iterator;
-typedef DT3::Cell_handle	Cell_handle;
-typedef DT3::Finite_cells_iterator	cells_iterator;
+typedef DT3::Vertex_handle Vertex_handle;
+typedef DT3::Finite_vertices_iterator vertices_iterator;
+typedef DT3::Edge Edge;
+typedef DT3::Finite_edges_iterator edges_iterator;
+typedef DT3::Facet Facet;
+typedef DT3::Finite_facets_iterator facets_iterator;
+typedef DT3::Cell_handle Cell_handle;
+typedef DT3::Finite_cells_iterator cells_iterator;
+
+class UnionFind {
+	std::vector<unsigned> id;
+	std::vector<unsigned> rank;
+
+public:
+	UnionFind(unsigned N) {
+		id.resize(N);
+		rank.resize(N);
+		for (unsigned i = 0; i < N; i++) {
+			id[i] = i;
+			rank[i] = 0;
+		}
+	}
+	unsigned find(unsigned x) {
+		if (id[x] != x)
+			id[x] = find(id[x]);
+		return id[x];
+	}
+	void Union(unsigned x, unsigned y) {
+		unsigned first = find(x);
+		unsigned second = find(y);
+		if (first == second)
+			return;
+		if (rank[first] > rank[second]) {
+			id[second] = first;
+		}
+		else if (rank[first] < rank[second]) {
+			id[first] = second;
+		}
+		else if (second != first) {
+			id[second] = first;
+			rank[first]++;
+		}
+	}
+};
+
 
 #endif
