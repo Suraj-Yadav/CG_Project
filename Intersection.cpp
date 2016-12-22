@@ -2,10 +2,10 @@
 #include <CGAL/intersections.h>
 #include <iostream>
 
-using Kernel = CGAL::Simple_cartesian<double>;
-using Point2D = Kernel::Point_2;
-using Segment2D = Kernel::Segment_2;
-using Intersect2D = Kernel::Intersect_2;
+typedef CGAL::Simple_cartesian<double> Kernel;
+typedef Kernel::Point_2 Point2D;
+typedef Kernel::Segment_2 Segment2D;
+typedef Kernel::Intersect_2 Intersect2D;
 
 int main() {
 	Point2D p[4];

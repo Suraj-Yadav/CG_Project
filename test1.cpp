@@ -8,10 +8,10 @@
 
 #define val(x) std::cout << #x "=" << x << "\n";
 
-using Kernel = CGAL::Simple_cartesian<double>;
-using Point3D = Kernel::Point_3;
-using Segment3D = Kernel::Segment_3;
-using DT3 = CGAL::Delaunay_triangulation_3<Kernel>;
+typedef CGAL::Simple_cartesian<double> Kernel;
+typedef Kernel::Point_3 Point3D;
+typedef Kernel::Segment_3 Segment3D;
+typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
 
 int main(int argc, char *argv[]) {
 

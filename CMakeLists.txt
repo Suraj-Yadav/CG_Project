@@ -1,4 +1,4 @@
-# Removing the extra Cnfig types like RelWithDebInfo MinSizeRel.
+# Removing the extra Config types like RelWithDebInfo MinSizeRel.
 # Never used them anyway.
 set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE )
 
