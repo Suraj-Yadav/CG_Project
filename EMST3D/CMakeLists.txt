@@ -1,7 +1,10 @@
-# Created by the script cgal_create_cmake_script
-# This is the CMake script for compiling a CGAL application.
+# Removing the extra Cnfig types like RelWithDebInfo MinSizeRel.
+# Never used them anyway.
+set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE )
 
-project (Triangulation_demo_3)
+# Name of the Project File. 
+# For Visual Studio it turns out to be the solution file name
+project (EMST3D)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

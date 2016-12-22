@@ -77,7 +77,7 @@ void Scene::loadPointsOFF(const char* filename) {
 	/* Check the combinatorial validity of the triangulation */
 	/* Note: when it is set to be true,
       messages describing the first invalidity encountered are printed. */
-	if (!m_dt.is_valid()) // default: false - verbosity off
+		
 		showError(QObject::tr("Error: fail to build a Delauna4y triangulation."));
 	/* Check the dimension */
 	if (m_dt.dimension() != 3)
