@@ -2,10 +2,12 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 BreakBeforeBraces: Custom
 ColumnLimit: 0
-DerivePointerAlignment: true
+DerivePointerAlignment: false
+PointerAlignment: Right
 IndentCaseLabels: true
 IndentWidth: 4
 TabWidth: 4
+SortIncludes: false
 Language: Cpp
 UseTab: Always
 NamespaceIndentation: All
