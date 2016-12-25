@@ -44,8 +44,8 @@ vector<Segment3D> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3
 	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
 		auto edge = dt.segment(*edgeItr);
 		auto u = getIndex(points, edge.start()),
-			v = getIndex(points, edge.end());
-		allEdges.push_back({edge.squared_length(),u,v});
+			 v = getIndex(points, edge.end());
+		allEdges.push_back(make_tuple(edge.squared_length(), u, v));
 	}
 
 	sort(allEdges.begin(),
@@ -57,7 +57,7 @@ vector<Segment3D> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3
 	for (auto edge : allEdges) {
 		auto u = get<1>(edge), v = get<2>(edge);
 		if (!uf.same_set(handle[u], handle[v])) {
-			mst.push_back(Segment3D(points[u],points[v]));
+			mst.push_back(Segment3D(points[u], points[v]));
 			uf.unify_sets(handle[u], handle[v]);
 		}
 	}
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 	auto mst1 = get_Mst_Edges_Kruskal(points, dt);
 	finish = chrono::high_resolution_clock::now();
 	cout << "Kruskal MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-	
+
 	//start = chrono::high_resolution_clock::now();
 	//auto mst2 = get_Mst_Edges_Prim(points, dt);
 	//finish = chrono::high_resolution_clock::now();
@@ -164,7 +164,6 @@ int main(int argc, char *argv[]) {
 	//	cerr << "Size Different : Kruskal = " << mst1.size() << ", Prim = " << mst2.size() << "\n";
 	//	return 1;
 	//}
-
 
 	start = chrono::high_resolution_clock::now();
 	outputFile << points.size() << "\n";

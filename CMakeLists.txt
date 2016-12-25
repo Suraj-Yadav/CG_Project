@@ -33,6 +33,8 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	# Intersection.cpp
 	#-----------------------------------
 		add_executable( Intersection Intersection.cpp )
+		set_property(TARGET Intersection PROPERTY CXX_STANDARD 14)
+		set_property(TARGET Intersection PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(Intersection ${CGAL_LIBRARIES})
 		
 		
@@ -40,6 +42,8 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	# test1.cpp
 	#-----------------------------------
 		add_executable( test1 test1.cpp )
+		set_property(TARGET test1 PROPERTY CXX_STANDARD 14)
+		set_property(TARGET test1 PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test1 ${CGAL_LIBRARIES})
 
 		
