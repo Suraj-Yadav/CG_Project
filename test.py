@@ -7,7 +7,10 @@ inputFile = open(sys.argv[sys.argv.index("--") + 1])
 
 # inputFile = open("G:/work/CG_Project/build/output.txt")
 
-bpy.ops.object.delete(use_global=False)
+scene = bpy.context.scene
+print("scene.objects.active", scene.objects.active)
+if scene.objects.active != None:
+	bpy.ops.object.delete(use_global=False)
 
 mesh = bmesh.new()	# type: bmesh.BMesh
 
