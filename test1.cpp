@@ -1,7 +1,7 @@
-#include <CGAL/Simple_cartesian.h>
 #include <CGAL/Delaunay_triangulation_3.h>
-#include <CGAL/Union_find.h>
 #include <CGAL/IO/read_xyz_points.h>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Union_find.h>
 #include <iostream>
 #include <fstream>
 #include <limits>
@@ -17,11 +17,20 @@ const double inf = std::numeric_limits<double>::infinity();
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_3 Point3D;
 typedef Kernel::Segment_3 Segment3D;
+typedef Kernel::Triangle_3 Triangle3D;
 typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
 
 template <typename T>
 size_t getIndex(const vector<T> &v, const T &elem) {
 	return lower_bound(v.begin(), v.end(), elem) - v.begin();
+}
+
+vector<Triangle3D> get_All_Facets(const DT3 &dt) {
+	vector<Triangle3D> allFacets;
+	for (auto faceItr = dt.finite_facets_begin(); faceItr != dt.finite_facets_end(); faceItr++)
+		allFacets.push_back(dt.triangle(*faceItr));
+
+	return allFacets;
 }
 
 vector<Segment3D> get_All_Edges(const DT3 &dt) {
@@ -151,9 +160,15 @@ int main(int argc, char *argv[]) {
 	cout << "Delaunay Triangulation created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
 	start = chrono::high_resolution_clock::now();
-	auto mst1 = get_Mst_Edges_Kruskal(points, dt);
+	auto mst1 = get_All_Edges(dt);
 	finish = chrono::high_resolution_clock::now();
 	cout << "Kruskal MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
+
+
+	start = chrono::high_resolution_clock::now();
+	auto facets = get_All_Facets(dt);
+	finish = chrono::high_resolution_clock::now();
+	cout << "Faces created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
 	//start = chrono::high_resolution_clock::now();
 	//auto mst2 = get_Mst_Edges_Prim(points, dt);
@@ -167,15 +182,23 @@ int main(int argc, char *argv[]) {
 
 	start = chrono::high_resolution_clock::now();
 	outputFile << points.size() << "\n";
-	for (auto point : points) {
+	for (Point3D point : points) {
 		outputFile << point << "\n";
 	}
 
 	outputFile << mst1.size() << "\n";
-
-	for (auto edge : mst1) {
-		outputFile << getIndex(points, edge.start()) << " " << getIndex(points, edge.end()) << "\n";
+	for (Segment3D edge : mst1) {
+		outputFile << getIndex(points, edge[0]) << " " << getIndex(points, edge[1]) << "\n";
 	}
+
+	outputFile << facets.size() << "\n";
+	for (Triangle3D triangle : facets) {
+		outputFile << getIndex(points, triangle[0]) << " "
+				   << getIndex(points, triangle[1]) << " "
+				   << getIndex(points, triangle[2]) << "\n";
+	}
+
+		
 
 	finish = chrono::high_resolution_clock::now();
 	cout << "Output created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
