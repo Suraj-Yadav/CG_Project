@@ -1,6 +1,6 @@
+#include <CGAL/Simple_cartesian.h>
 #include <CGAL/Delaunay_triangulation_3.h>
 #include <CGAL/IO/read_xyz_points.h>
-#include <CGAL/Simple_cartesian.h>
 #include <CGAL/Union_find.h>
 #include <iostream>
 #include <fstream>
@@ -164,7 +164,6 @@ int main(int argc, char *argv[]) {
 	finish = chrono::high_resolution_clock::now();
 	cout << "Kruskal MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
-
 	start = chrono::high_resolution_clock::now();
 	auto facets = get_All_Facets(dt);
 	finish = chrono::high_resolution_clock::now();
@@ -197,8 +196,6 @@ int main(int argc, char *argv[]) {
 				   << getIndex(points, triangle[1]) << " "
 				   << getIndex(points, triangle[2]) << "\n";
 	}
-
-		
 
 	finish = chrono::high_resolution_clock::now();
 	cout << "Output created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
