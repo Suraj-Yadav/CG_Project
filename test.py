@@ -1,55 +1,217 @@
+bl_info = {'name': 'CGAL Integration', 'category': 'All'}
+
 import bpy
+import subprocess
+from bpy.types import Operator
+from bpy.types import Panel
+from bpy.types import Context
 import bmesh
 from typing import List
 import sys
 
-inputFile = open(sys.argv[sys.argv.index("--") + 1])
-
-# inputFile = open("G:/work/CG_Project/build/output.txt")
-
-scene = bpy.context.scene
-print("scene.objects.active", scene.objects.active)
-if scene.objects.active != None:
-	bpy.ops.object.delete(use_global=False)
-
-mesh = bmesh.new()	# type: bmesh.BMesh
-
-verticesCount = int(inputFile.readline())	# type: int
-vertices = [] # type: List[bmesh.BMVert]
-
-for i in range(verticesCount):
-	coord = tuple(map(float,inputFile.readline().split()))
-	vertices.append(mesh.verts.new(coord))
-
-edgeCount = int(inputFile.readline())	# type: int
-
-for i in range(edgeCount):
-	(u,v) = tuple(map(int,inputFile.readline().split()))
-	if (vertices[u],vertices[v]) not in mesh.edges:
-		mesh.edges.new((vertices[u],vertices[v]))
-
-faceCount = int(inputFile.readline())	# type: int
-
-for i in range(faceCount):
-	(a,b,c) = tuple(map(int,inputFile.readline().split()))
-	if (vertices[a], vertices[b], vertices[c]) not in mesh.faces:
-		mesh.faces.new((vertices[a], vertices[b], vertices[c]))
-
-me = bpy.data.meshes.new("Mesh")
-
-mesh.to_mesh(me)
-mesh.free()
-
-scene = bpy.context.scene
-obj = bpy.data.objects.new("Object", me)
-scene.objects.link(obj)
-
-bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-bpy.ops.object.location_clear(clear_delta = False)
+addon_keymaps = []
 
 
-# Select and make active
-scene.objects.active = obj
-obj.select = True
+def showOnlyThis(objName: str):
+	if objName in bpy.data.objects:
+		for obj in bpy.data.objects:
+			obj.hide = True
+		bpy.data.objects[objName].hide = False
+		bpy.context.scene.objects.active = bpy.data.objects[objName]
+		bpy.data.objects[objName].select = True
+		return True
+	return False
 
-print("ALL is Well")
+
+class vertexModel(Operator):
+	bl_idname = 'mesh.show_cgal_vertex_model'
+	bl_label = 'Show Vertex'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		if showOnlyThis('Model_Vertex'):
+			return {"FINISHED"}
+		else:
+			self.report({'ERROR'}, "No Vertex Data Found")
+			return {"CANCELLED"}
+
+
+class edgeModel(Operator):
+	bl_idname = 'mesh.show_cgal_edge_model'
+	bl_label = 'Show Edge'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		if showOnlyThis('Model_Edge'):
+			return {"FINISHED"}
+		else:
+			self.report({'ERROR'}, "No Edge Data Found")
+			return {"CANCELLED"}
+
+
+class faceModel(Operator):
+	bl_idname = 'mesh.show_cgal_face_model'
+	bl_label = 'Show Face'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		if showOnlyThis('Model_Face'):
+			return {"FINISHED"}
+		else:
+			self.report({'ERROR'}, "No Face Data Found")
+			return {"CANCELLED"}
+
+
+class updateModel(Operator):
+	bl_idname = 'mesh.update_cgal_model'
+	bl_label = 'Update Model'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		executable = context.scene.executable
+		inputFileName = context.scene.inputFile
+		outputFile = "output.txt"
+		process = subprocess.run([executable, inputFileName, outputFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		stdout = process.stdout.decode("utf-8").replace('\r', '')
+		stderr = process.stderr.decode("utf-8").replace('\r', '')
+		print(stdout)
+
+		if process.returncode == 0:
+			self.report({'INFO'}, "External Program Completed")
+			scene = context.scene
+
+			for obj in bpy.data.objects:
+				obj.hide = False
+				obj.select = False
+
+			for obj in bpy.data.objects:
+				obj.select = True
+				bpy.ops.object.delete(use_global=False)
+
+			edgeMesh = bmesh.new()  # type: bmesh.BMesh
+			faceMesh = bmesh.new()  # type: bmesh.BMesh
+			verticesInVertexMesh = []  # type: List[bmesh.BMVert]
+
+			vertices = []  # type: List[Tuple[float]]
+
+			inputFile = open(outputFile)
+
+			verticesCount = int(inputFile.readline())  # type: int
+			for i in range(verticesCount):
+				vertices.append(list(map(float, inputFile.readline().split())))
+
+			if verticesCount > 0:
+				me = bpy.data.meshes.new("Vertex_Mesh")
+				vertexMesh = bmesh.new()  # type: bmesh.BMesh
+				vertexHandle = [vertexMesh.verts.new(i) for i in vertices]
+				vertexMesh.to_mesh(me)
+				vertexMesh.free()
+				obj = bpy.data.objects.new("Model_Vertex", me)
+				scene.objects.link(obj)
+				print("Vertex Model Generated")
+
+			edgesCount = int(inputFile.readline())  # type: int
+			if edgesCount > 0:
+				me = bpy.data.meshes.new("Edges_Mesh")
+				edgeMesh = bmesh.new()  # type: bmesh.BMesh
+				vertexHandle = [edgeMesh.verts.new(i) for i in vertices]
+				for i in range(edgesCount):
+					edge = list(map(int, inputFile.readline().split()))
+					edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+				edgeMesh.to_mesh(me)
+				edgeMesh.free()
+				obj = bpy.data.objects.new("Model_Edge", me)
+				scene.objects.link(obj)
+				print("Edge Model Generated")
+
+			facesCount = int(inputFile.readline())  # type: int
+			if facesCount > 0:
+				me = bpy.data.meshes.new("Face_Mesh")
+				faceMesh = bmesh.new()  # type: bmesh.BMesh
+				vertexHandle = [faceMesh.verts.new(i) for i in vertices]
+				for i in range(facesCount):
+					face = list(map(int, inputFile.readline().split()))
+					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
+				faceMesh.to_mesh(me)
+				faceMesh.free()
+				obj = bpy.data.objects.new("Model_Face", me)
+				scene.objects.link(obj)
+				print("Face Model Generated")
+
+			return {"FINISHED"}
+		else:
+			self.report({'ERROR'}, stdout + "\n" + stderr)
+			return {"CANCELLED"}
+
+
+# class CGALIntegration(bpy.types.Operator):
+# 	bl_idname = 'mesh.cgal_integration'
+# 	bl_label = 'Add Cube'
+# 	bl_options = {"REGISTER", "UNDO"}
+
+# 	def execute(self, context):
+# 		bpy.ops.mesh.primitive_cube_add()
+# 		return {"FINISHED"}
+
+
+def register():
+	bpy.utils.register_class(vertexModel)
+	bpy.utils.register_class(edgeModel)
+	bpy.utils.register_class(faceModel)
+	bpy.utils.register_class(updateModel)
+	bpy.utils.register_class(cgalPanel)
+	bpy.types.Scene.inputFile = bpy.props.StringProperty(name="InputFile", subtype='FILE_PATH')
+	bpy.types.Scene.executable = bpy.props.StringProperty(name="Executable", subtype='FILE_PATH')
+
+	# handle the keymap
+	wm = bpy.context.window_manager
+
+	km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
+	kmi = km.keymap_items.new(vertexModel.bl_idname, 'P', 'PRESS', ctrl=False, shift=False)
+	addon_keymaps.append((km, kmi))
+	kmi = km.keymap_items.new(edgeModel.bl_idname, 'E', 'PRESS', ctrl=False, shift=False)
+	addon_keymaps.append((km, kmi))
+	kmi = km.keymap_items.new(faceModel.bl_idname, 'F', 'PRESS', ctrl=False, shift=False)
+	addon_keymaps.append((km, kmi))
+
+
+def unregister():
+	bpy.utils.unregister_class(vertexModel)
+	bpy.utils.unregister_class(edgeModel)
+	bpy.utils.unregister_class(faceModel)
+	bpy.utils.unregister_class(updateModel)
+	bpy.utils.unregister_class(cgalPanel)
+	del bpy.types.Scene.inputFile
+	del bpy.types.Scene.executable
+
+	for km, kmi in addon_keymaps:
+		km.keymap_items.remove(kmi)
+	addon_keymaps.clear()
+
+
+class cgalPanel(Panel):
+	bl_idname = "panel.cgal"
+	bl_label = "CGAL"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "TOOLS"
+	# bl_category = "Tools"
+	bl_category = "CGAL"
+
+	def draw(self, context: Context):
+		layout = self.layout
+		row = layout.row()
+		row.operator("mesh.show_cgal_vertex_model", icon="VERTEXSEL")
+		row = layout.row()
+		row.operator("mesh.show_cgal_edge_model", icon="EDGESEL")
+		row = layout.row()
+		row.operator("mesh.show_cgal_face_model", icon="FACESEL")
+		col = layout.column()
+		col.prop(context.scene, 'inputFile')
+		col = layout.column()
+		col.prop(context.scene, 'executable')
+		row = layout.row()
+		row.operator("mesh.update_cgal_model", icon="FILE_REFRESH")
+
+
+if __name__ == "__main__":
+	register()
