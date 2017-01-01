@@ -118,6 +118,55 @@ vector<Segment3D> get_Mst_Edges_Prim(const vector<Point3D> &points, const DT3 &d
 	return mst;
 }
 
+void process(const vector<Point3D> &points, const DT3 &dt, vector<Triangle3D> &faces) {
+	faces.clear();
+	vector<vector<pair<size_t, double>>> adjList;
+	set<pair<size_t, size_t>> edges;
+	adjList.resize(points.size());
+	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
+		auto edge = dt.segment(*edgeItr);
+		auto u = getIndex(points, edge.start()),
+			v = getIndex(points, edge.end());
+		adjList[u].push_back({v, edge.squared_length()});
+		adjList[v].push_back({u, edge.squared_length()});
+		edges.insert({u, v});
+		edges.insert({v, u});
+	}
+
+	vector<double> weight(points.size(), inf);
+	vector<bool> inPQ(points.size(), true);
+	vector<size_t> parent(points.size(), SIZE_MAX);
+	vector<set<size_t>> children(points.size());
+	set<pair<double, size_t>> pq;
+
+	weight[0] = 0;
+	for (size_t i = 0; i < points.size(); i++)
+		pq.insert({weight[i], i});
+
+	while (!pq.empty()) {
+		size_t u = pq.begin()->second;
+		pq.erase(pq.begin());
+		inPQ[u] = false;
+		if (parent[u] != SIZE_MAX) {
+			for (size_t v : children[parent[u]])
+				if (edges.find({u,v}) != edges.end())
+					faces.push_back(Triangle3D(points[v], points[u], points[parent[u]]));
+			children[parent[u]].insert(u);
+		}
+		for (auto elem : adjList[u]) {
+			size_t v = elem.first;
+			double w = elem.second;
+			if (inPQ[v] && weight[v] > w) {
+				pq.erase(pq.find({weight[v], v}));
+				weight[v] = w;
+				pq.insert({w, v});
+				parent[v] = u;
+			}
+		}
+	}
+
+}
+
 int main(int argc, char *argv[]) {
 
 	if (argc != 3) {
@@ -167,10 +216,11 @@ int main(int argc, char *argv[]) {
 	finish = chrono::high_resolution_clock::now();
 	cout << "Kruskal MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
-	/*start = chrono::high_resolution_clock::now();
-	faces = get_All_Facets(dt);
+	start = chrono::high_resolution_clock::now();
+	//faces = get_All_Facets(dt);
+	process(points, dt, faces);
 	finish = chrono::high_resolution_clock::now();
-	cout << "Faces created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";*/
+	cout << "Faces created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
 	//start = chrono::high_resolution_clock::now();
 	//auto mst2 = get_Mst_Edges_Prim(points, dt);

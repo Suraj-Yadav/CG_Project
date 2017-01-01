@@ -11,7 +11,6 @@ import sys
 
 addon_keymaps = []
 
-
 def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
