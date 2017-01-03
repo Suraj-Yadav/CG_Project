@@ -28,48 +28,54 @@
 #include "ui_EMST2D.h"
 #include <CGAL/Qt/DemosMainWindow.h>
 
-using Kernel = CGAL::Exact_predicates_inexact_constructions_kernel;
-using Point2D = Kernel::Point_2;
-using Segment2D = Kernel::Segment_2;
-using Iso_rectangle2D = Kernel::Iso_rectangle_2;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+typedef Kernel::Point_2 Point2D;
+typedef Kernel::Segment_2 Segment2D;
+typedef Kernel::Triangle_2 Triangle2D;
+typedef Kernel::Iso_rectangle_2 Iso_rectangle2D;
+typedef CGAL::Delaunay_triangulation_2<Kernel> Delaunay;
 
-using Delaunay = CGAL::Delaunay_triangulation_2<Kernel>;
+using namespace std;
 
-class UnionFind {
-	std::vector<unsigned> id;
-	std::vector<unsigned> rank;
+template <typename T>
+size_t getIndex(const vector<T> &v, const T &elem) {
+	return lower_bound(v.begin(), v.end(), elem) - v.begin();
+}
 
-  public:
-	UnionFind(unsigned N) {
-		id.resize(N);
-		rank.resize(N);
-		for (unsigned i = 0; i < N; i++) {
-			id[i] = i;
-			rank[i] = 0;
+
+vector<Segment2D> get_Mst_Edges_Kruskal(const vector<Point2D> &points, const Delaunay &dt) {
+	vector<CGAL::Union_find<size_t>::handle> handle;
+	CGAL::Union_find<size_t> uf;
+	handle.reserve(points.size());
+
+	for (size_t i = 0; i < points.size(); i++)
+		handle.push_back(uf.make_set(i));
+
+	vector<tuple<double, size_t, size_t>> allEdges;
+	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
+		auto edge = dt.segment(*edgeItr);
+		auto u = getIndex(points, edge.start()),
+			v = getIndex(points, edge.end());
+		allEdges.push_back(make_tuple(edge.squared_length(), u, v));
+	}
+
+	sort(allEdges.begin(),
+		allEdges.end(),
+		[](tuple<double, size_t, size_t> &a, tuple<double, size_t, size_t> &b) -> bool { return get<0>(a) < get<0>(b); });
+
+	vector<Segment2D> mst;
+
+	for (auto edge : allEdges) {
+		auto u = get<1>(edge), v = get<2>(edge);
+		if (!uf.same_set(handle[u], handle[v])) {
+			mst.push_back(Segment2D(points[u], points[v]));
+			uf.unify_sets(handle[u], handle[v]);
 		}
 	}
-	unsigned find(unsigned x) {
-		if (id[x] != x)
-			id[x] = find(id[x]);
-		return id[x];
-	}
-	void Union(unsigned x, unsigned y) {
-		unsigned first = find(x);
-		unsigned second = find(y);
-		if (first == second)
-			return;
-		if (rank[first] > rank[second]) {
-			id[second] = first;
-		}
-		else if (rank[first] < rank[second]) {
-			id[first] = second;
-		}
-		else if (second != first) {
-			id[second] = first;
-			rank[first]++;
-		}
-	}
-};
+	return mst;
+}
+
+
 
 class MainWindow : public CGAL::Qt::DemosMainWindow,
 				   public Ui::EMST2DWindow {
@@ -227,30 +233,8 @@ void MainWindow::open(QString fileName) {
 		points.push_back(p);
 	}
 	dt.insert(points.begin(), points.end());
-	
-	std::vector<Segment2D> allEdges;
 
-	std::map<Point2D, CGAL::Union_find<Point2D>::handle> mapping;
-	CGAL::Union_find<Point2D> uf;
-
-	for (auto vertItr = dt.finite_vertices_begin(); vertItr != dt.finite_vertices_end(); ++vertItr) {
-		auto p = vertItr->handle()->point();
-		mapping.insert({p, uf.make_set(p)});
-	}
-
-	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++)
-		allEdges.push_back(dt.segment(*edgeItr));
-	
-	std::sort(allEdges.begin(),
-			  allEdges.end(),
-			  [](Segment2D & a, Segment2D & b) -> bool { return a.squared_length() < b.squared_length(); });
-
-	for (auto edge : allEdges) {
-		if (!uf.same_set(mapping[edge.start()], mapping[edge.end()])) {
-			mstSegments.push_back(edge);
-			uf.unify_sets(mapping[edge.start()], mapping[edge.end()]);
-		}
-	}
+	mstSegments = get_Mst_Edges_Kruskal(points, dt);
 
 	// default cursor
 	QApplication::restoreOverrideCursor();

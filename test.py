@@ -7,15 +7,15 @@ from bpy.types import Panel
 from bpy.types import Context
 import bmesh
 from typing import List
-import sys
+from os import path
 
 addon_keymaps = []
 
 def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
-			obj.hide = True
-		bpy.data.objects[objName].hide = False
+			obj.select = False
+		# bpy.data.objects[objName].hide = not bpy.data.objects[objName].hide
 		bpy.context.scene.objects.active = bpy.data.objects[objName]
 		bpy.data.objects[objName].select = True
 		return True
@@ -69,7 +69,8 @@ class updateModel(Operator):
 	def execute(self, context: Context):
 		executable = context.scene.executable
 		inputFileName = context.scene.inputFile
-		outputFile = "output.txt"
+		outputFile = path.join(path.dirname(path.abspath(executable)),"output.txt")
+
 		process = subprocess.run([executable, inputFileName, outputFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout = process.stdout.decode("utf-8").replace('\r', '')
 		stderr = process.stderr.decode("utf-8").replace('\r', '')
@@ -121,6 +122,7 @@ class updateModel(Operator):
 				edgeMesh.free()
 				obj = bpy.data.objects.new("Model_Edge", me)
 				scene.objects.link(obj)
+				obj.show_x_ray = True
 				print("Edge Model Generated")
 
 			facesCount = int(inputFile.readline())  # type: int
@@ -130,7 +132,8 @@ class updateModel(Operator):
 				vertexHandle = [faceMesh.verts.new(i) for i in vertices]
 				for i in range(facesCount):
 					face = list(map(int, inputFile.readline().split()))
-					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
+					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))						
+					
 				faceMesh.to_mesh(me)
 				faceMesh.free()
 				obj = bpy.data.objects.new("Model_Face", me)

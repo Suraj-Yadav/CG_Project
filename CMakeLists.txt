@@ -39,12 +39,20 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		
 		
 	#-----------------------------------
-	# test1.cpp
+	# test2D.cpp
 	#-----------------------------------
-		add_executable( test1 test1.cpp )
-		set_property(TARGET test1 PROPERTY CXX_STANDARD 14)
-		set_property(TARGET test1 PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(test1 ${CGAL_LIBRARIES})
+		add_executable( test2D test2D.cpp )
+		set_property(TARGET test2D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET test2D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(test2D ${CGAL_LIBRARIES})
+		
+	#-----------------------------------
+	# test3D.cpp
+	#-----------------------------------
+		add_executable( test3D test3D.cpp )
+		set_property(TARGET test3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(test3D ${CGAL_LIBRARIES})
 
 		
 	# --------------------------------
@@ -79,29 +87,29 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	# Demo: EMST2D
 	# --------------------------------
 	# UI files (Qt Designer files)
-	# qt5_wrap_ui( DT_UI_FILES EMST2D.ui )
+	qt5_wrap_ui( DT_UI_FILES EMST2D.ui )
 
 	# qrc files (resources files, that contain icons, at least)
-	# qt5_add_resources ( CGAL_Qt5_RESOURCE_FILES ./EMST2D.qrc )
+	qt5_add_resources ( CGAL_Qt5_RESOURCE_FILES ./EMST2D.qrc )
 
 	# use the Qt MOC preprocessor on classes that derives from QObject
-	# qt5_generate_moc( EMST2D.cpp "${CMAKE_CURRENT_BINARY_DIR}/EMST2D.moc" )
+	qt5_generate_moc( EMST2D.cpp "${CMAKE_CURRENT_BINARY_DIR}/EMST2D.moc" )
 
-	# 	add_library( CGAL SHARED IMPORTED ) 
-	# 	SET_PROPERTY(TARGET CGAL PROPERTY IMPORTED_LOCATION ${CGAL_LIBRARY} )
+	add_library( CGAL SHARED IMPORTED ) 
+	SET_PROPERTY(TARGET CGAL PROPERTY IMPORTED_LOCATION ${CGAL_LIBRARY} )
 
 	# The executable itself.
-	# add_executable	( EMST2D EMST2D.cpp EMST2D.moc ${DT_UI_FILES} ${DT_RESOURCE_FILES} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES} )
+	add_executable	( EMST2D EMST2D.cpp EMST2D.moc ${DT_UI_FILES} ${DT_RESOURCE_FILES} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES} )
 
-	# qt5_use_modules(EMST2D Xml Script OpenGL Svg)
+	qt5_use_modules(EMST2D Xml Script OpenGL Svg)
 
-	# add_to_cached_list( CGAL_EXECUTABLE_TARGETS EMST2D )
+	add_to_cached_list( CGAL_EXECUTABLE_TARGETS EMST2D )
 
 
 	# Link with Qt libraries
-	# target_link_libraries( EMST2D ${QT_LIBRARIES} )
+	target_link_libraries( EMST2D ${QT_LIBRARIES} )
 	# And with CGAL libraries
-	# target_link_libraries( EMST2D ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+	target_link_libraries( EMST2D ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
 else()
 
