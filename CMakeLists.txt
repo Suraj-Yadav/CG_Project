@@ -41,7 +41,7 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	#-----------------------------------
 	# test2D.cpp
 	#-----------------------------------
-		add_executable( test2D test2D.cpp )
+		add_executable( test2D test2D.cpp util.h)
 		set_property(TARGET test2D PROPERTY CXX_STANDARD 14)
 		set_property(TARGET test2D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test2D ${CGAL_LIBRARIES})
@@ -49,10 +49,18 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	#-----------------------------------
 	# test3D.cpp
 	#-----------------------------------
-		add_executable( test3D test3D.cpp )
+		add_executable( test3D test3D.cpp util.h)
 		set_property(TARGET test3D PROPERTY CXX_STANDARD 14)
 		set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test3D ${CGAL_LIBRARIES})
+		
+	#-----------------------------------
+	# assignment.cpp
+	#-----------------------------------
+		add_executable( assignment assignment.cpp util.h)
+		set_property(TARGET assignment PROPERTY CXX_STANDARD 14)
+		set_property(TARGET assignment PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(assignment ${CGAL_LIBRARIES})
 
 		
 	# --------------------------------
