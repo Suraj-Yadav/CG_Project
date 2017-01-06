@@ -29,6 +29,9 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		add_definitions(-DCGAL_USE_CORE)
 	endif()
 	
+	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	
 	#-----------------------------------
 	# Intersection.cpp
 	#-----------------------------------
@@ -36,6 +39,7 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		set_property(TARGET Intersection PROPERTY CXX_STANDARD 14)
 		set_property(TARGET Intersection PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(Intersection ${CGAL_LIBRARIES})
+		set_target_properties( Intersection PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 		
 	#-----------------------------------
@@ -45,6 +49,7 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		set_property(TARGET test2D PROPERTY CXX_STANDARD 14)
 		set_property(TARGET test2D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test2D ${CGAL_LIBRARIES})
+		set_target_properties( test2D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 	#-----------------------------------
 	# test3D.cpp
@@ -53,7 +58,7 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		set_property(TARGET test3D PROPERTY CXX_STANDARD 14)
 		set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test3D ${CGAL_LIBRARIES})
-		
+		set_target_properties( test3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 	#-----------------------------------
 	# assignment.cpp
 	#-----------------------------------
@@ -61,7 +66,7 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 		set_property(TARGET assignment PROPERTY CXX_STANDARD 14)
 		set_property(TARGET assignment PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(assignment ${CGAL_LIBRARIES})
-
+		set_target_properties( assignment PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 	# --------------------------------
 	# Demo: Polygon_2
@@ -95,29 +100,29 @@ if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWE
 	# Demo: EMST2D
 	# --------------------------------
 	# UI files (Qt Designer files)
-	qt5_wrap_ui( DT_UI_FILES EMST2D.ui )
+	#qt5_wrap_ui( DT_UI_FILES EMST2D.ui )
 
 	# qrc files (resources files, that contain icons, at least)
-	qt5_add_resources ( CGAL_Qt5_RESOURCE_FILES ./EMST2D.qrc )
+	#qt5_add_resources ( CGAL_Qt5_RESOURCE_FILES ./EMST2D.qrc )
 
 	# use the Qt MOC preprocessor on classes that derives from QObject
-	qt5_generate_moc( EMST2D.cpp "${CMAKE_CURRENT_BINARY_DIR}/EMST2D.moc" )
+	#qt5_generate_moc( EMST2D.cpp "${CMAKE_CURRENT_BINARY_DIR}/EMST2D.moc" )
 
-	add_library( CGAL SHARED IMPORTED ) 
-	SET_PROPERTY(TARGET CGAL PROPERTY IMPORTED_LOCATION ${CGAL_LIBRARY} )
+	#add_library( CGAL SHARED IMPORTED ) 
+	#SET_PROPERTY(TARGET CGAL PROPERTY IMPORTED_LOCATION ${CGAL_LIBRARY} )
 
 	# The executable itself.
-	add_executable	( EMST2D EMST2D.cpp EMST2D.moc ${DT_UI_FILES} ${DT_RESOURCE_FILES} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES} )
+	#add_executable	( EMST2D EMST2D.cpp EMST2D.moc ${DT_UI_FILES} ${DT_RESOURCE_FILES} ${CGAL_Qt5_RESOURCE_FILES} ${CGAL_Qt5_MOC_FILES} )
 
-	qt5_use_modules(EMST2D Xml Script OpenGL Svg)
+	#qt5_use_modules(EMST2D Xml Script OpenGL Svg)
 
-	add_to_cached_list( CGAL_EXECUTABLE_TARGETS EMST2D )
+	#add_to_cached_list( CGAL_EXECUTABLE_TARGETS EMST2D )
 
 
 	# Link with Qt libraries
-	target_link_libraries( EMST2D ${QT_LIBRARIES} )
+	#target_link_libraries( EMST2D ${QT_LIBRARIES} )
 	# And with CGAL libraries
-	target_link_libraries( EMST2D ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
+	#target_link_libraries( EMST2D ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES} )
 
 else()
 

@@ -11,11 +11,13 @@ from os import path
 
 addon_keymaps = []
 
+
 def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
 			obj.select = False
-		# bpy.data.objects[objName].hide = not bpy.data.objects[objName].hide
+			obj.hide = True
+		bpy.data.objects[objName].hide = False
 		bpy.context.scene.objects.active = bpy.data.objects[objName]
 		bpy.data.objects[objName].select = True
 		return True
@@ -69,7 +71,10 @@ class updateModel(Operator):
 	def execute(self, context: Context):
 		executable = context.scene.executable
 		inputFileName = context.scene.inputFile
-		outputFile = path.join(path.dirname(path.abspath(executable)),"output.txt")
+		outputFile = path.join(path.dirname(path.abspath(executable)), "output.txt")
+
+		if bpy.context.active_object != None and bpy.context.active_object.mode == 'EDIT':
+			bpy.ops.object.mode_set(mode='OBJECT')
 
 		process = subprocess.run([executable, inputFileName, outputFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout = process.stdout.decode("utf-8").replace('\r', '')
@@ -93,12 +98,22 @@ class updateModel(Operator):
 			verticesInVertexMesh = []  # type: List[bmesh.BMVert]
 
 			vertices = []  # type: List[Tuple[float]]
+			edges = []  # type: List[Tuple[int]]
+			faces = []  # type: List[Tuple[int]]
 
 			inputFile = open(outputFile)
 
 			verticesCount = int(inputFile.readline())  # type: int
 			for i in range(verticesCount):
 				vertices.append(list(map(float, inputFile.readline().split())))
+
+			edgesCount = int(inputFile.readline())  # type: int
+			for i in range(edgesCount):
+				edges.append(list(map(int, inputFile.readline().split())))
+
+			facesCount = int(inputFile.readline())  # type: int
+			for i in range(facesCount):
+				faces.append(list(map(int, inputFile.readline().split())))
 
 			if verticesCount > 0:
 				me = bpy.data.meshes.new("Vertex_Mesh")
@@ -108,36 +123,42 @@ class updateModel(Operator):
 				vertexMesh.free()
 				obj = bpy.data.objects.new("Model_Vertex", me)
 				scene.objects.link(obj)
+				obj.data.show_edge_seams = True
 				print("Vertex Model Generated")
 
-			edgesCount = int(inputFile.readline())  # type: int
 			if edgesCount > 0:
 				me = bpy.data.meshes.new("Edges_Mesh")
 				edgeMesh = bmesh.new()  # type: bmesh.BMesh
 				vertexHandle = [edgeMesh.verts.new(i) for i in vertices]
-				for i in range(edgesCount):
-					edge = list(map(int, inputFile.readline().split()))
+				for edge in edges:
 					edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+
 				edgeMesh.to_mesh(me)
 				edgeMesh.free()
 				obj = bpy.data.objects.new("Model_Edge", me)
 				scene.objects.link(obj)
-				obj.show_x_ray = True
+				obj.data.show_edge_seams = True
+				# obj.show_x_ray = True
 				print("Edge Model Generated")
 
-			facesCount = int(inputFile.readline())  # type: int
 			if facesCount > 0:
 				me = bpy.data.meshes.new("Face_Mesh")
 				faceMesh = bmesh.new()  # type: bmesh.BMesh
 				vertexHandle = [faceMesh.verts.new(i) for i in vertices]
-				for i in range(facesCount):
-					face = list(map(int, inputFile.readline().split()))
-					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))						
-					
+				for face in faces:
+					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
+
+				for edge in edges:
+					meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+					if meshEdge == None:
+						meshEdge = edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+					meshEdge.seam = True
+
 				faceMesh.to_mesh(me)
 				faceMesh.free()
 				obj = bpy.data.objects.new("Model_Face", me)
 				scene.objects.link(obj)
+				obj.data.show_edge_seams = True
 				print("Face Model Generated")
 
 			return {"FINISHED"}
