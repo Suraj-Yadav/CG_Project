@@ -12,7 +12,7 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 OLD)
 endif()
 
-find_package(CGAL COMPONENTS Qt5 Core)
+find_package(CGAL COMPONENTS Core)
 
 include(${CGAL_USE_FILE})
 
@@ -24,7 +24,7 @@ include(${CGAL_USE_FILE})
 
 include_directories (BEFORE ../../include)
 
-if (CGAL_FOUND AND CGAL_Qt5_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
+if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 	if(CGAL_Core_FOUND)
 		add_definitions(-DCGAL_USE_CORE)
 	endif()
@@ -132,9 +132,9 @@ else()
 		set(MISSING_DEPENDENCIES "${MISSING_DEPENDENCIES} CGAL,")
 	endif()
 
-	if(NOT CGAL_Qt5_FOUND)
-		set(MISSING_DEPENDENCIES "${MISSING_DEPENDENCIES} CGAL_Qt5,")
-	endif()
+	# if(NOT CGAL_Qt5_FOUND)
+		# set(MISSING_DEPENDENCIES "${MISSING_DEPENDENCIES} CGAL_Qt5,")
+	# endif()
 
 	# if(NOT Qt5_FOUND)
 	# 	set(MISSING_DEPENDENCIES "${MISSING_DEPENDENCIES} Qt5,")

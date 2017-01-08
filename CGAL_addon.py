@@ -151,7 +151,7 @@ class updateModel(Operator):
 				for edge in edges:
 					meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
 					if meshEdge == None:
-						meshEdge = edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+						meshEdge = faceMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
 					meshEdge.seam = True
 
 				faceMesh.to_mesh(me)

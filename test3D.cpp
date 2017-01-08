@@ -128,11 +128,13 @@ vector<Segment3D> get_Mst_Edges_Prim(const vector<Point3D> &points, const DT3 &d
 
 double getTriangleScore(const Point3D &a, const Point3D &b, const Point3D &c) {
 	Vector3D AB(a, b), AC(a, c), BC(b, c);
-	return std::sqrt(AB.squared_length()) + std::sqrt(AC.squared_length()) + std::sqrt(BC.squared_length());
+	//return std::sqrt(AB.squared_length()) + std::sqrt(AC.squared_length()) + std::sqrt(BC.squared_length());
 	AB = AB / std::sqrt(AB.squared_length());
 	AC = AC / std::sqrt(AC.squared_length());
 	BC = BC / std::sqrt(BC.squared_length());
-	double score = (AB * AC);
+	double score = AB * AC;
+	// score += std::acos(AC * BC);
+	// score += std::acos(-AB * BC);
 	score = std::min(AC * BC, score);
 	score = std::min(-AB * BC, score);
 	return score;
@@ -162,7 +164,7 @@ bool validToAdd(const vector<Point3D> &points, const vector<size_t> &edgeDegree,
 			ans = false;
 	}
 	//if (!ans)
-		//print("Problem Adding ", newPoint, "to", edge[0], edge[1], ". Sizeof edgedegree=", edgeDegree.size());
+	//print("Problem Adding ", newPoint, "to", edge[0], edge[1], ". Sizeof edgedegree=", edgeDegree.size());
 	return ans;
 }
 
@@ -220,90 +222,175 @@ vector<set<size_t>> getAdjList(size_t pointsCount, const vector<myPair<size_t>> 
 void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_t>> &faces, vector<myPair<size_t>> &edges) {
 	faces.clear();
 	vector<myPair<size_t>> allEdges = get_All_Edges(dt, points);
-	vector<set<size_t>> adjList = getAdjList(points.size(), allEdges);
-	
+	vector<set<size_t>> adjList = getAdjList(points.size(), edges);
+
 	//edges = get_Mst_Edges_Kruskal(points, dt);	//Edges are already of MST
 
-	std::queue<size_t> Q;
 	vector<vector<size_t>> edgeDegree(allEdges.size());
-	
+
 	set<myTriple<size_t>> trianglesCovered;
 	set<myPair<size_t>> edgesCovered;
 
+	set<std::tuple<double, myPair<size_t>, size_t>, std::greater<std::tuple<double, myPair<size_t>, size_t>>> pq;
+
 	for (size_t i = 0; i < edges.size(); i++) sortThis(edges[i]);
 	for (size_t i = 0; i < allEdges.size(); i++) sortThis(allEdges[i]);
-	
+
 	std::sort(allEdges.begin(), allEdges.end());
 	std::sort(edges.begin(), edges.end());
 
 	for (size_t i = 0; i < edges.size(); i++) edgesCovered.insert(edges[i]);
-	
-	for (size_t i = 0; i < edges.size(); i++) Q.push(getIndex(allEdges,edges[i]));
-	
-	while (!Q.empty()) {
-		auto edgeIndex = Q.front();
-		Q.pop();
-		auto edge = allEdges[edgeIndex];
-		switch (edgeDegree[edgeIndex].size()) {
-			case 0: {
-				set<size_t> commonPoints;
-				std::set_intersection(
-					adjList[edge[0]].begin(), adjList[edge[0]].end(), 
-					adjList[edge[1]].begin(), adjList[edge[1]].end(), 
-					std::inserter(commonPoints, commonPoints.end()));
-				size_t nextPoint = SIZE_MAX;
-				double score = inf;
-				myPair<size_t> newEdge1, newEdge2;
-				size_t newEdgeIndex1, newEdgeIndex2;
-				myTriple<size_t> tri;
-				for (auto point : commonPoints) {
-					tri = {edge[0], edge[1], point};
-					newEdge1 = {edge[0], point}, newEdge2 = {edge[1], point};
-					sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
 
-					newEdgeIndex1 = getIndex(allEdges, newEdge1);
-					newEdgeIndex2 = getIndex(allEdges, newEdge2);
-
-					double tempScore = getTriangleScore(points[tri[0]], points[tri[1]], points[tri[2]]);
-					//print(tempScore, " ");
-					if (trianglesCovered.find(tri) == trianglesCovered.end() &&
-						validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1]) &&
-						validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0]) &&
-						tempScore > 0 &&
-						tempScore < score) {
-						nextPoint = point;
-						score = tempScore;
-					}
-				}
-				//println(":", score);
-				if (nextPoint == SIZE_MAX)
-					break;
-				tri = {edge[0], edge[1], nextPoint};
-				newEdge1 = {edge[0], nextPoint}, newEdge2 = {edge[1], nextPoint};
-				sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
-				newEdgeIndex1 = getIndex(allEdges, newEdge1);
-				newEdgeIndex2 = getIndex(allEdges, newEdge2);
-				
-				edgesCovered.insert(newEdge1);
-				edgesCovered.insert(newEdge2);
-				
-				edgeDegree[newEdgeIndex1].push_back(edge[1]);
-				edgeDegree[newEdgeIndex2].push_back(edge[0]);
-				edgeDegree[edgeIndex].push_back(nextPoint);
-				
-				trianglesCovered.insert(tri);
-				faces.push_back(tri);
-			}
-			case 1: {
-			}
-			case 2:
-			default:
-				continue;
+	for (auto edge : edges) {
+		set<size_t> commonPoints;
+		std::set_union(
+			adjList[edge[0]].begin(), adjList[edge[0]].end(),
+			adjList[edge[1]].begin(), adjList[edge[1]].end(),
+			std::inserter(commonPoints, commonPoints.end()));
+		commonPoints.erase(edge[0]);
+		commonPoints.erase(edge[1]);
+		for (auto point : commonPoints) {
+			double tempScore = getTriangleScore(points[edge[0]], points[edge[1]], points[point]);
+			pq.insert({tempScore, edge, point});
 		}
 	}
+
+	while (!pq.empty()) {
+		auto element = *pq.begin();
+		pq.erase(pq.begin());
+		myPair<size_t> edge = get<1>(element);
+		size_t point = get<2>(element);
+		size_t edgeIndex = getIndex(allEdges, edge);
+		if (edgeDegree[edgeIndex].size() == 2)
+			continue;
+
+		myTriple<size_t> tri = {edge[0], edge[1], point};
+		myPair<size_t> newEdge1 = {edge[0], point}, newEdge2 = {edge[1], point};
+		sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
+		size_t newEdgeIndex1 = getIndex(allEdges, newEdge1),
+			   newEdgeIndex2 = getIndex(allEdges, newEdge2);
+
+		if (trianglesCovered.find(tri) == trianglesCovered.end() &&
+			validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1]) &&
+			validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0]) &&
+			(edgeDegree[edgeIndex].size() == 0 || (edgeDegree[edgeIndex].size() == 1 && validToAdd(points, edgeDegree[edgeIndex], edge, point)))) {
+
+			edgesCovered.insert(newEdge1);
+			edgesCovered.insert(newEdge2);
+
+			edgeDegree[newEdgeIndex1].push_back(edge[1]);
+			edgeDegree[newEdgeIndex2].push_back(edge[0]);
+			edgeDegree[edgeIndex].push_back(point);
+
+			trianglesCovered.insert(tri);
+			faces.push_back(tri);
+
+			adjList[edge[0]].insert(edge[1]);
+			adjList[edge[0]].insert(point);
+			adjList[edge[1]].insert(edge[0]);
+			adjList[edge[1]].insert(point);
+			adjList[point].insert(edge[0]);
+			adjList[point].insert(edge[1]);
+
+			for (int i = 0; i < 3; i++) {
+				size_t u = tri[i], v = tri[(i + 1) % 3];
+				
+				if (u > v) std::swap(u, v);
+				
+				set<size_t> commonPoints;
+				std::set_union(
+					adjList[u].begin(), adjList[u].end(),
+					adjList[v].begin(), adjList[v].end(),
+					std::inserter(commonPoints, commonPoints.end()));
+				commonPoints.erase(u);
+				commonPoints.erase(v);
+				
+				for (auto w: commonPoints) {
+					myTriple<size_t> tempTri = {u, v, w};
+					double tempScore = getTriangleScore(points[u], points[v], points[w]);
+					if (trianglesCovered.find(tempTri) == trianglesCovered.end())
+						pq.insert({tempScore, {u, v}, w});
+				}
+			}
+		}
+	}
+	/*switch (edgeDegree[edgeIndex].size()) {
+		case 0: {
+		}
+		case 1: {
+			set<size_t> commonPoints;
+			std::set_union(
+				adjList[edge[0]].begin(), adjList[edge[0]].end(),
+				adjList[edge[1]].begin(), adjList[edge[1]].end(),
+				std::inserter(commonPoints, commonPoints.end()));
+			commonPoints.erase(edge[0]);
+			commonPoints.erase(edge[1]);
+			size_t nextPoint = SIZE_MAX;
+			double score = -2;
+			myPair<size_t> newEdge1, newEdge2;
+			size_t newEdgeIndex1, newEdgeIndex2;
+			myTriple<size_t> tri;
+			for (auto point : commonPoints) {
+				tri = {edge[0], edge[1], point};
+				newEdge1 = {edge[0], point}, newEdge2 = {edge[1], point};
+				sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
+
+				newEdgeIndex1 = getIndex(allEdges, newEdge1);
+				newEdgeIndex2 = getIndex(allEdges, newEdge2);
+
+				double tempScore = getTriangleScore(points[tri[0]], points[tri[1]], points[tri[2]]);
+				//print(tempScore, " ");
+				if (trianglesCovered.find(tri) == trianglesCovered.end() &&
+					validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1]) &&
+					validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0]) &&
+					(edgeDegree[edgeIndex].size() == 0 || (edgeDegree[edgeIndex].size() == 1 && validToAdd(points, edgeDegree[edgeIndex], edge, point))) &&
+					tempScore > -0.1 &&
+					tempScore > score) {
+					nextPoint = point;
+					score = tempScore;
+				}
+			}
+			//println(":", score);
+			if (nextPoint == SIZE_MAX)
+				break;
+			tri = {edge[0], edge[1], nextPoint};
+			newEdge1 = {edge[0], nextPoint}, newEdge2 = {edge[1], nextPoint};
+			sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
+			newEdgeIndex1 = getIndex(allEdges, newEdge1);
+			newEdgeIndex2 = getIndex(allEdges, newEdge2);
+
+			edgesCovered.insert(newEdge1);
+			edgesCovered.insert(newEdge2);
+
+			edgeDegree[newEdgeIndex1].push_back(edge[1]);
+			edgeDegree[newEdgeIndex2].push_back(edge[0]);
+			edgeDegree[edgeIndex].push_back(nextPoint);
+
+			adjList[edge[0]].insert(edge[1]);
+			adjList[edge[0]].insert(nextPoint);
+			adjList[edge[1]].insert(edge[0]);
+			adjList[edge[1]].insert(nextPoint);
+			adjList[nextPoint].insert(edge[0]);
+			adjList[nextPoint].insert(edge[1]);
+
+			if (edgeDegree[edgeIndex].size() < 2)
+				Q.push(edgeIndex);
+			if (edgeDegree[newEdgeIndex1].size() < 2)
+				Q.push(newEdgeIndex1);
+			if (edgeDegree[newEdgeIndex2].size() < 2)
+				Q.push(newEdgeIndex2);
+
+			trianglesCovered.insert(tri);
+			faces.push_back(tri);
+		}
+		case 2:
+		default:
+			continue;
+		}
+	}*/
 	//edges.clear();
 	//for (auto edge : edgesCovered)
-		//edges.push_back(edge);
+	//edges.push_back(edge);
 }
 
 int main(int argc, char *argv[]) {
