@@ -32,28 +32,30 @@ typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
 
 const double inf = std::numeric_limits<double>::infinity();
 
-vector<myTriple<size_t>> get_All_Facets(const DT3 &dt, const vector<Point3D> &points) {
-	vector<myTriple<size_t>> allFacets;
+std::ofstream logFile;
+
+vector<myFace> get_All_Facets(const DT3 &dt, const vector<Point3D> &points) {
+	vector<myFace> allFacets;
 	for (auto faceItr = dt.finite_facets_begin(); faceItr != dt.finite_facets_end(); faceItr++) {
 		Triangle3D tri = dt.triangle(*faceItr);
-		allFacets.push_back({getIndex(points, tri[0]),
-							 getIndex(points, tri[1]),
-							 getIndex(points, tri[2])});
+		allFacets.push_back(myFace(getIndex(points, tri[0]),
+								   getIndex(points, tri[1]),
+								   getIndex(points, tri[2])));
 	}
 	return allFacets;
 }
 
-vector<myPair<size_t>> get_All_Edges(const DT3 &dt, const vector<Point3D> &points) {
-	vector<myPair<size_t>> allEdges;
+vector<myEdge> get_All_Edges(const DT3 &dt, const vector<Point3D> &points) {
+	vector<myEdge> allEdges;
 	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
 		Segment3D seg = dt.segment(*edgeItr);
-		allEdges.push_back({getIndex(points, seg[0]),
-							getIndex(points, seg[1])});
+		allEdges.push_back(myEdge(getIndex(points, seg[0]),
+								  getIndex(points, seg[1])));
 	}
 	return allEdges;
 }
 
-vector<myPair<size_t>> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3 &dt) {
+vector<myEdge> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3 &dt) {
 	vector<CGAL::Union_find<size_t>::handle> handle;
 	CGAL::Union_find<size_t> uf;
 	handle.reserve(points.size());
@@ -70,7 +72,7 @@ vector<myPair<size_t>> get_Mst_Edges_Kruskal(const vector<Point3D> &points, cons
 		 allEdges.end(),
 		 [](std::tuple<double, size_t, size_t> &a, std::tuple<double, size_t, size_t> &b) -> bool { return get<0>(a) < get<0>(b); });
 
-	vector<myPair<size_t>> mst;
+	vector<myEdge> mst;
 
 	for (auto edge : allEdges) {
 		auto u = get<1>(edge), v = get<2>(edge);
@@ -140,16 +142,7 @@ double getTriangleScore(const Point3D &a, const Point3D &b, const Point3D &c) {
 	return score;
 }
 
-bool append(set<array<size_t, 3>> &trianglesCovered, array<size_t, 3> A) {
-	array<size_t, 3> arr;
-	arr[0] = std::min(std::min(A[0], A[1]), A[2]);
-	arr[2] = std::max(std::max(A[0], A[1]), A[2]);
-	arr[1] = A[0] + A[1] + A[2] - arr[0] - arr[2];
-	auto ans = trianglesCovered.insert(arr);
-	return ans.second;
-}
-
-bool validToAdd(const vector<Point3D> &points, const vector<size_t> &edgeDegree, const myPair<size_t> &edge, size_t newPoint) {
+bool validToAdd(const vector<Point3D> &points, const vector<size_t> &edgeDegree, const myEdge &edge, size_t newPoint, bool debug=false) {
 	bool ans;
 	if (edgeDegree.size() == 2)
 		ans = false;
@@ -163,17 +156,21 @@ bool validToAdd(const vector<Point3D> &points, const vector<size_t> &edgeDegree,
 		else
 			ans = false;
 	}
-	//if (!ans)
-	//print("Problem Adding ", newPoint, "to", edge[0], edge[1], ". Sizeof edgedegree=", edgeDegree.size());
+	if (!ans && debug) {
+		fprint(logFile, "Problem Adding ", newPoint, "to", edge, ". edgedegree={");
+		for (size_t p : edgeDegree)
+			fprint(logFile, p);
+		fprintln(logFile,"}");
+	}
 	return ans;
 }
 
 bool process2(const vector<Point3D> &points,
 			  vector<set<size_t>> &adjList,
-			  set<myTriple<size_t>> &trianglesCovered,
-			  map<myPair<size_t>, size_t> &edgeDegreeMap,
+			  set<myFace> &trianglesCovered,
+			  map<myEdge, size_t> &edgeDegreeMap,
 			  vector<vector<size_t>> &edgeDegree,
-			  myTriple<size_t> UVW) {
+			  myFace UVW) {
 	print("Checking ", UVW[0], UVW[1], UVW[2]);
 
 	auto u = UVW[0], v = UVW[1], w = UVW[2];
@@ -188,8 +185,7 @@ bool process2(const vector<Point3D> &points,
 		print("Score = ", score);
 		return false;
 	}
-	myPair<size_t> UV = {UVW[0], UVW[1]}, UW = {UVW[0], UVW[2]}, WV = {UVW[1], UVW[2]};
-	sortThis(UV), sortThis(UW), sortThis(WV);
+	myEdge UV(UVW[0], UVW[1]), UW(UVW[0], UVW[2]), WV(UVW[1], UVW[2]);
 
 	auto UVIndex = addToMap(edgeDegreeMap, edgeDegree, UV),
 		 UWIndex = addToMap(edgeDegreeMap, edgeDegree, UW),
@@ -210,7 +206,7 @@ bool process2(const vector<Point3D> &points,
 	return true;
 }
 
-vector<set<size_t>> getAdjList(size_t pointsCount, const vector<myPair<size_t>> &edges) {
+vector<set<size_t>> getAdjList(size_t pointsCount, const vector<myEdge> &edges) {
 	vector<set<size_t>> adjList(pointsCount);
 	for (auto edge : edges) {
 		adjList[edge[0]].insert(edge[1]);
@@ -219,27 +215,36 @@ vector<set<size_t>> getAdjList(size_t pointsCount, const vector<myPair<size_t>> 
 	return adjList;
 }
 
-void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_t>> &faces, vector<myPair<size_t>> &edges) {
+void process(const vector<Point3D> &points, const DT3 &dt, vector<myFace> &faces, vector<myEdge> &edges) {
 	faces.clear();
-	vector<myPair<size_t>> allEdges = get_All_Edges(dt, points);
+	vector<myEdge> allEdges = get_All_Edges(dt, points);
 	vector<set<size_t>> adjList = getAdjList(points.size(), edges);
+	vector<myFace> allFaces = get_All_Facets(dt, points);
 
 	//edges = get_Mst_Edges_Kruskal(points, dt);	//Edges are already of MST
 
 	vector<vector<size_t>> edgeDegree(allEdges.size());
 
-	set<myTriple<size_t>> trianglesCovered;
-	set<myPair<size_t>> edgesCovered;
+	set<myFace> trianglesCovered;
+	set<myEdge> edgesCovered;
 
-	set<std::tuple<double, myPair<size_t>, size_t>, std::greater<std::tuple<double, myPair<size_t>, size_t>>> pq;
-
-	for (size_t i = 0; i < edges.size(); i++) sortThis(edges[i]);
-	for (size_t i = 0; i < allEdges.size(); i++) sortThis(allEdges[i]);
+	set<std::tuple<double, myEdge, size_t>, std::greater<std::tuple<double, myEdge, size_t>>> pq;
 
 	std::sort(allEdges.begin(), allEdges.end());
+	std::sort(allFaces.begin(), allFaces.end());
 	std::sort(edges.begin(), edges.end());
 
+	//for (size_t i = 0; i < allEdges.size(); i++)
+		//fprintln(logFile, i, ":", allEdges[i]);
+
+	//fprintln(logFile);
+
+	//for (size_t i = 0; i < allFaces.size(); i++)
+		//fprintln(logFile, i, ":", allFaces[i]);
+	//return;
+
 	for (size_t i = 0; i < edges.size(); i++) edgesCovered.insert(edges[i]);
+	for (auto elem : edgeDegree) elem.clear();
 
 	for (auto edge : edges) {
 		set<size_t> commonPoints;
@@ -251,22 +256,34 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 		commonPoints.erase(edge[1]);
 		for (auto point : commonPoints) {
 			double tempScore = getTriangleScore(points[edge[0]], points[edge[1]], points[point]);
-			pq.insert({tempScore, edge, point});
+			myFace temp(edge[0], edge[1], point);
+			if (getIndex(allFaces, temp) < allFaces.size())
+				pq.insert(std::make_tuple(tempScore, edge, point));
 		}
 	}
 
 	while (!pq.empty()) {
+		if (true) {
+			myEdge e(1375, 1537);
+			size_t i = getIndex(allEdges, e);
+			fprint(logFile, "The truth is that edge", e, "has index", i, "and degree={");
+			for (auto p : edgeDegree[i])
+				fprint(logFile, p);
+			fprintln(logFile, "}");
+		}
 		auto element = *pq.begin();
 		pq.erase(pq.begin());
-		myPair<size_t> edge = get<1>(element);
+		myEdge edge = get<1>(element);
 		size_t point = get<2>(element);
 		size_t edgeIndex = getIndex(allEdges, edge);
-		if (edgeDegree[edgeIndex].size() == 2)
+		myFace tri(edge[0], edge[1], point);
+		fprint(logFile, "Considering", tri);
+		if (edgeDegree[edgeIndex].size() == 2) {
+			fprintln(logFile, ": Rejected");
+			fprintln(logFile, val(edgeDegree[edgeIndex].size() == 2));
 			continue;
-
-		myTriple<size_t> tri = {edge[0], edge[1], point};
-		myPair<size_t> newEdge1 = {edge[0], point}, newEdge2 = {edge[1], point};
-		sortThis(tri), sortThis(newEdge1), sortThis(newEdge2);
+		}
+		myEdge newEdge1(edge[0], point), newEdge2(edge[1], point);
 		size_t newEdgeIndex1 = getIndex(allEdges, newEdge1),
 			   newEdgeIndex2 = getIndex(allEdges, newEdge2);
 
@@ -274,13 +291,16 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 			validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1]) &&
 			validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0]) &&
 			(edgeDegree[edgeIndex].size() == 0 || (edgeDegree[edgeIndex].size() == 1 && validToAdd(points, edgeDegree[edgeIndex], edge, point)))) {
-
+			fprintln(logFile, ": Accepted");
 			edgesCovered.insert(newEdge1);
 			edgesCovered.insert(newEdge2);
 
 			edgeDegree[newEdgeIndex1].push_back(edge[1]);
 			edgeDegree[newEdgeIndex2].push_back(edge[0]);
 			edgeDegree[edgeIndex].push_back(point);
+			fprintln(logFile, "Added", edge[1], "to", newEdge1, "which has index", newEdgeIndex1);
+			fprintln(logFile, "Added", edge[0], "to", newEdge2 , "which has index", newEdgeIndex2);
+			fprintln(logFile, "Added", point, "to", edge, "which has index", edgeIndex);
 
 			trianglesCovered.insert(tri);
 			faces.push_back(tri);
@@ -294,9 +314,9 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 
 			for (int i = 0; i < 3; i++) {
 				size_t u = tri[i], v = tri[(i + 1) % 3];
-				
+
 				if (u > v) std::swap(u, v);
-				
+
 				set<size_t> commonPoints;
 				std::set_union(
 					adjList[u].begin(), adjList[u].end(),
@@ -304,14 +324,27 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 					std::inserter(commonPoints, commonPoints.end()));
 				commonPoints.erase(u);
 				commonPoints.erase(v);
-				
-				for (auto w: commonPoints) {
-					myTriple<size_t> tempTri = {u, v, w};
+
+				for (auto w : commonPoints) {
+					myFace tempTri(u, v, w);
+					myEdge tempEdge(u, v);
 					double tempScore = getTriangleScore(points[u], points[v], points[w]);
-					if (trianglesCovered.find(tempTri) == trianglesCovered.end())
-						pq.insert({tempScore, {u, v}, w});
+					if (trianglesCovered.find(tempTri) == trianglesCovered.end() &&
+						std::binary_search(allFaces.begin(), allFaces.end(), tempTri))
+						pq.insert(std::make_tuple(tempScore, tempEdge, w));
 				}
 			}
+		}
+		else {
+			fprintln(logFile, ": Rejected");
+			fprintln(logFile, val(edge));
+			fprintln(logFile, val(newEdge1));
+			fprintln(logFile, val(newEdge2));
+			fprintln(logFile, val(trianglesCovered.find(tri) == trianglesCovered.end()));
+			fprintln(logFile, val(validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1],true)));
+			fprintln(logFile, val(validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0], true)));
+			fprintln(logFile, val(edgeDegree[edgeIndex].size() == 0));
+			fprintln(logFile, val(edgeDegree[edgeIndex].size() == 1 && validToAdd(points, edgeDegree[edgeIndex], edge, point, true)));
 		}
 	}
 	/*switch (edgeDegree[edgeIndex].size()) {
@@ -327,9 +360,9 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 			commonPoints.erase(edge[1]);
 			size_t nextPoint = SIZE_MAX;
 			double score = -2;
-			myPair<size_t> newEdge1, newEdge2;
+			myEdge newEdge1, newEdge2;
 			size_t newEdgeIndex1, newEdgeIndex2;
-			myTriple<size_t> tri;
+			myFace tri;
 			for (auto point : commonPoints) {
 				tri = {edge[0], edge[1], point};
 				newEdge1 = {edge[0], point}, newEdge2 = {edge[1], point};
@@ -387,10 +420,10 @@ void process(const vector<Point3D> &points, const DT3 &dt, vector<myTriple<size_
 		default:
 			continue;
 		}
-	}*/
-	//edges.clear();
-	//for (auto edge : edgesCovered)
-	//edges.push_back(edge);
+	}
+	edges.clear();
+	for (auto edge : edgesCovered)
+	edges.push_back(edge);*/
 }
 
 int main(int argc, char *argv[]) {
@@ -402,6 +435,9 @@ int main(int argc, char *argv[]) {
 
 	std::ifstream inputFile(argv[1]);
 	std::ofstream outputFile(argv[2]);
+	logFile.open("G:/work/CG_Project/build/log.txt");
+	logFile << std::boolalpha;
+
 	DT3 dt;
 
 	vector<Point3D> points;
@@ -412,9 +448,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	sort(points.begin(), points.end());				  // vector may have repeated elements like 1 1 2 2 3 3 3 4 4 5 5 6 7
-	auto last = unique(points.begin(), points.end()); // vector now holds {1 2 3 4 5 6 7 x x x x x x}, where 'x' is indeterminate
-	points.erase(last, points.end());
+	sortAndRemoveDuplicate(points);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 	cout << points.size() << " points read in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
@@ -434,8 +468,8 @@ int main(int argc, char *argv[]) {
 	finish = std::chrono::high_resolution_clock::now();
 	cout << "Delaunay Triangulation created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 
-	vector<myPair<size_t>> edges;
-	vector<myTriple<size_t>> faces;
+	vector<myEdge> edges;
+	vector<myFace> faces;
 
 	start = std::chrono::high_resolution_clock::now();
 	edges = get_Mst_Edges_Kruskal(points, dt);
@@ -449,7 +483,6 @@ int main(int argc, char *argv[]) {
 	edges = get_All_Edges(dt);*/
 
 	start = std::chrono::high_resolution_clock::now();
-	//faces = get_All_Facets(dt);
 	process(points, dt, faces, edges);
 	finish = std::chrono::high_resolution_clock::now();
 	cout << "Faces created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";

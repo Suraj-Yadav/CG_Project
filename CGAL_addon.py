@@ -95,7 +95,6 @@ class updateModel(Operator):
 
 			edgeMesh = bmesh.new()  # type: bmesh.BMesh
 			faceMesh = bmesh.new()  # type: bmesh.BMesh
-			verticesInVertexMesh = []  # type: List[bmesh.BMVert]
 
 			vertices = []  # type: List[Tuple[float]]
 			edges = []  # type: List[Tuple[int]]

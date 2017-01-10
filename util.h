@@ -6,27 +6,37 @@
 #include <vector>
 #include <map>
 
-#define val(x) cout << #x "=" << x << "\n"
+#define val(x) #x "=", x
 
-#define print(...) debug_print(__VA_ARGS__)
-#define println(...) {debug_print(__VA_ARGS__);debug_print('\n');}
+#define fprint(os, ...) debug_print(os, __VA_ARGS__)
+#define fprintln(os, ...)              \
+	{                                 \
+		debug_print(os, __VA_ARGS__); \
+		os<<'\n';        \
+	}
 
-void debug_print() {
+#define print(...) fprint(std::cout, __VA_ARGS__)
+#define println(...) fprintln(std::cout, __VA_ARGS__)
+
+void debug_print(std::ostream &os) {
 }
 template <typename T, typename... Args>
-void debug_print(T t, Args... args) {
-	std::cout << t << " ";
-	debug_print(args...);
+void debug_print(std::ostream &os, T t, Args... args) {
+	os << t << " ";
+	debug_print(os, args...);
 }
 
 template <class T>
 size_t getIndex(const std::vector<T> &v, const T &elem) {
-	return lower_bound(v.begin(), v.end(), elem) - v.begin();
+	auto ptr =lower_bound(v.begin(), v.end(), elem);
+	if (ptr == v.end())
+		throw std::runtime_error("World is coming to an end with elem" );
+	return ptr - v.begin();
 }
 
 template <class T>
 void sortAndRemoveDuplicate(std::vector<T> &v) {
-	sort(v.begin(), v.end());				  // vector may have repeated elements like 1 1 2 2 3 3 3 4 4 5 5 6 7
+	std::sort(v.begin(), v.end());			// vector may have repeated elements like 1 1 2 2 3 3 3 4 4 5 5 6 7
 	auto last = unique(v.begin(), v.end()); // vector now holds {1 2 3 4 5 6 7 x x x x x x}, where 'x' is indeterminate
 	v.erase(last, v.end());
 }
@@ -40,17 +50,77 @@ size_t addToMap(std::map<T, size_t> &mapping, std::vector<T2> &vec, const T &obj
 	return mapping[object];
 }
 
-
 template <typename T, size_t N>
 void sortThis(std::array<T, N> &t) {
-	sort(t.begin(), t.end());
+	std::sort(t.begin(), t.end());
 }
 
-template <typename T>  
+template <typename T>
 using myPair = std::array<T, 2>;
 
 template <typename T>
 using myTriple = std::array<T, 3>;
 
-#endif // UTIL_H
+class myEdge {
+	size_t data[2];
 
+  public:
+	myEdge(size_t a, size_t b) : data{a, b} {
+		if (data[0] > data[1]) std::swap(data[0], data[1]);
+	}
+	size_t &operator[](int index) {
+		if (index < 0 || index > 1)
+			throw std::out_of_range("Index tried to access=" + index);
+		return data[index];
+	}
+	const size_t &operator[](int index) const {
+		if (index < 0 || index > 1)
+			throw std::out_of_range("Index tried to access=" + index);
+		return data[index];
+	}
+};
+
+std::pair<int, int> a;
+
+bool operator<(const myEdge &lhs, const myEdge &rhs) {
+	if (lhs[0] < rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]))
+		return true;
+	return false;
+}
+
+std::ostream &operator<<(std::ostream &os, const myEdge &e) {
+	return os << "(" << e[0] << " " << e[1] << ")";
+}
+
+class myFace {
+	size_t data[3];
+
+  public:
+	myFace(size_t a, size_t b, size_t c) : data{a, b, c} {
+		if (data[0] > data[1]) std::swap(data[0], data[1]);
+		if (data[1] > data[2]) std::swap(data[1], data[2]);
+		if (data[0] > data[1]) std::swap(data[0], data[1]);
+	}
+	size_t &operator[](int index) {
+		if (index < 0 || index > 2)
+			throw std::out_of_range("Index tried to access=" + index);
+		return data[index];
+	}
+	const size_t &operator[](int index) const {
+		if (index < 0 || index > 2)
+			throw std::out_of_range("Index tried to access=" + index);
+		return data[index];
+	}
+};
+
+bool operator<(const myFace &lhs, const myFace &rhs) {
+	if (lhs[0] < rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]) || (lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] < rhs[2]))
+		return true;
+	return false;
+}
+
+std::ostream &operator<<(std::ostream &os, const myFace &f) {
+	return os << "(" << f[0] << " " << f[1] << " " << f[2] << ")";
+}
+
+#endif // UTIL_H
