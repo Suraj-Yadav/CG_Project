@@ -67,6 +67,17 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_property(TARGET assignment PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(assignment ${CGAL_LIBRARIES})
 		set_target_properties( assignment PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	#-----------------------------------
+	# boundary_curve.cpp
+	#-----------------------------------
+		add_executable( boundary_curve boundary_curve.cpp)
+		set_property(TARGET boundary_curve PROPERTY CXX_STANDARD 14)
+		set_property(TARGET boundary_curve PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(boundary_curve ${CGAL_LIBRARIES})
+		set_target_properties( boundary_curve PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+
+
 		
 	# --------------------------------
 	# Demo: Polygon_2
