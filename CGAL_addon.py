@@ -11,7 +11,6 @@ from os import path
 
 addon_keymaps = []
 
-
 def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
@@ -24,9 +23,74 @@ def showOnlyThis(objName: str):
 	return False
 
 
+def selectInMesh(obj, selectionType: str, indices: bytes):
+	if obj.mode == 'EDIT':
+		bpy.ops.object.editmode_toggle()
+
+	index = indices.decode().split()  # type: List[str]
+
+	elements = getattr(obj.data, selectionType)
+
+	for i in range(len(elements)):
+		elements[i].select = False
+
+	for iStr in index:  # type: str
+		i = -1
+		if iStr.isdigit():
+			i = int(iStr)
+		if i < 0 or i >= len(elements):
+			print("'" + iStr + "'", "is an Invalid Index")
+		else:
+			elements[i].select = True
+
+	bpy.ops.object.editmode_toggle()
+
+
+class vertexSelector(Operator):
+	bl_idname = 'cgal.select_given_vertices'
+	bl_label = 'Select Vertices'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		obj = context.active_object
+		if obj == None:
+			self.report({'ERROR'}, "No Active Object")
+			return {"CANCELLED"}
+		selectInMesh(obj, 'vertices', context.scene.vertsToSelect)
+		return {"FINISHED"}
+
+
+class edgeSelector(Operator):
+	bl_idname = 'cgal.select_given_edges'
+	bl_label = 'Select Edges'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		obj = context.active_object
+		if obj == None:
+			self.report({'ERROR'}, "No Active Object")
+			return {"CANCELLED"}
+		selectInMesh(obj, 'edges', context.scene.edgesToSelect)
+		return {"FINISHED"}
+
+
+class faceSelector(Operator):
+	bl_idname = 'cgal.select_given_faces'
+	bl_label = 'Select Faces'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		obj = context.active_object
+		if obj == None:
+			self.report({'ERROR'}, "No Active Object")
+			return {"CANCELLED"}
+		selectInMesh(obj, 'polygons', context.scene.facesToSelect)
+		return {"FINISHED"}
+
+
 class vertexModel(Operator):
-	bl_idname = 'mesh.show_cgal_vertex_model'
-	bl_label = 'Show Vertex'
+	bl_idname = 'cgal.show_cgal_vertex_model'
+	bl_label = 'Show Vertex Model'
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context: Context):
@@ -38,8 +102,8 @@ class vertexModel(Operator):
 
 
 class edgeModel(Operator):
-	bl_idname = 'mesh.show_cgal_edge_model'
-	bl_label = 'Show Edge'
+	bl_idname = 'cgal.show_cgal_edge_model'
+	bl_label = 'Show Edge Model'
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context: Context):
@@ -51,8 +115,8 @@ class edgeModel(Operator):
 
 
 class faceModel(Operator):
-	bl_idname = 'mesh.show_cgal_face_model'
-	bl_label = 'Show Face'
+	bl_idname = 'cgal.show_cgal_face_model'
+	bl_label = 'Show Face Model'
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context: Context):
@@ -64,7 +128,7 @@ class faceModel(Operator):
 
 
 class updateModel(Operator):
-	bl_idname = 'mesh.update_cgal_model'
+	bl_idname = 'cgal.update_cgal_model'
 	bl_label = 'Update Model'
 	bl_options = {"REGISTER", "UNDO"}
 
@@ -146,6 +210,11 @@ class updateModel(Operator):
 				vertexHandle = [faceMesh.verts.new(i) for i in vertices]
 				for face in faces:
 					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
+				# for face in faces:
+				# 	a = faceMesh.verts.new(vertices[face[0]])
+				# 	b = faceMesh.verts.new(vertices[face[1]])
+				# 	c = faceMesh.verts.new(vertices[face[2]])
+				# 	faceMesh.faces.new((a, b, c))
 
 				for edge in edges:
 					meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
@@ -181,9 +250,15 @@ def register():
 	bpy.utils.register_class(edgeModel)
 	bpy.utils.register_class(faceModel)
 	bpy.utils.register_class(updateModel)
+	bpy.utils.register_class(vertexSelector)
+	bpy.utils.register_class(edgeSelector)
+	bpy.utils.register_class(faceSelector)
 	bpy.utils.register_class(cgalPanel)
 	bpy.types.Scene.inputFile = bpy.props.StringProperty(name="InputFile", subtype='FILE_PATH')
 	bpy.types.Scene.executable = bpy.props.StringProperty(name="Executable", subtype='FILE_PATH')
+	bpy.types.Scene.vertsToSelect = bpy.props.StringProperty(name="Vertices", subtype='BYTE_STRING')
+	bpy.types.Scene.edgesToSelect = bpy.props.StringProperty(name="Edges", subtype='BYTE_STRING')
+	bpy.types.Scene.facesToSelect = bpy.props.StringProperty(name="Faces", subtype='BYTE_STRING')
 
 	# handle the keymap
 	wm = bpy.context.window_manager
@@ -202,9 +277,15 @@ def unregister():
 	bpy.utils.unregister_class(edgeModel)
 	bpy.utils.unregister_class(faceModel)
 	bpy.utils.unregister_class(updateModel)
+	bpy.utils.unregister_class(vertexSelector)
+	bpy.utils.unregister_class(edgeSelector)
+	bpy.utils.unregister_class(faceSelector)
 	bpy.utils.unregister_class(cgalPanel)
 	del bpy.types.Scene.inputFile
 	del bpy.types.Scene.executable
+	del bpy.types.Scene.vertsToSelect
+	del bpy.types.Scene.edgesToSelect
+	del bpy.types.Scene.facesToSelect
 
 	for km, kmi in addon_keymaps:
 		km.keymap_items.remove(kmi)
@@ -222,17 +303,28 @@ class cgalPanel(Panel):
 	def draw(self, context: Context):
 		layout = self.layout
 		row = layout.row()
-		row.operator("mesh.show_cgal_vertex_model", icon="VERTEXSEL")
+		row.operator("cgal.show_cgal_vertex_model", icon="VERTEXSEL")
 		row = layout.row()
-		row.operator("mesh.show_cgal_edge_model", icon="EDGESEL")
+		row.operator("cgal.show_cgal_edge_model", icon="EDGESEL")
 		row = layout.row()
-		row.operator("mesh.show_cgal_face_model", icon="FACESEL")
+		row.operator("cgal.show_cgal_face_model", icon="FACESEL")
 		col = layout.column()
 		col.prop(context.scene, 'inputFile')
 		col = layout.column()
 		col.prop(context.scene, 'executable')
 		row = layout.row()
-		row.operator("mesh.update_cgal_model", icon="FILE_REFRESH")
+		row.operator("cgal.update_cgal_model", icon="FILE_REFRESH")
+		row = layout.row()
+		row.prop(context.scene, 'vertsToSelect')
+		row.operator("cgal.select_given_vertices", icon="VERTEXSEL")
+
+		row = layout.row()
+		row.prop(context.scene, 'edgesToSelect')
+		row.operator("cgal.select_given_edges", icon="EDGESEL")
+
+		row = layout.row()
+		row.prop(context.scene, 'facesToSelect')
+		row.operator("cgal.select_given_faces", icon="FACESEL")
 
 
 if __name__ == "__main__":

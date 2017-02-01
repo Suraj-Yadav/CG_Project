@@ -8,15 +8,22 @@
 
 #define val(x) #x "=", x
 
-#define fprint(os, ...) debug_print(os, __VA_ARGS__)
-#define fprintln(os, ...)              \
-	{                                 \
-		debug_print(os, __VA_ARGS__); \
-		os<<'\n';        \
-	}
+#define fprint(os, ...) ;
+#define fprintln(os, ...) ;
 
-#define print(...) fprint(std::cout, __VA_ARGS__)
-#define println(...) fprintln(std::cout, __VA_ARGS__)
+// #define fprint(os, ...) debug_print(os, __VA_ARGS__)
+// #define fprintln(os, ...)             \
+// 	{                                 \
+// 		debug_print(os, __VA_ARGS__); \
+// 		os << '\n';                   \
+// 	}
+
+#define print(...) debug_print(std::cout, __VA_ARGS__)
+#define println(...)                         \
+	{                                        \
+		debug_print(std::cout, __VA_ARGS__); \
+		std::cout << '\n';                   \
+	}
 
 void debug_print(std::ostream &os) {
 }
@@ -28,9 +35,11 @@ void debug_print(std::ostream &os, T t, Args... args) {
 
 template <class T>
 size_t getIndex(const std::vector<T> &v, const T &elem) {
-	auto ptr =lower_bound(v.begin(), v.end(), elem);
+	auto ptr = lower_bound(v.begin(), v.end(), elem);
 	if (ptr == v.end())
-		throw std::runtime_error("World is coming to an end with elem" );
+		throw std::runtime_error("World is coming to an end with elem");
+	if (elem != *ptr)
+		throw std::runtime_error("World is coming to an end with no matching element");
 	return ptr - v.begin();
 }
 
@@ -80,12 +89,14 @@ class myEdge {
 	}
 };
 
-std::pair<int, int> a;
-
 bool operator<(const myEdge &lhs, const myEdge &rhs) {
 	if (lhs[0] < rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]))
 		return true;
 	return false;
+}
+
+bool operator!=(const myEdge &lhs, const myEdge &rhs) {
+	return lhs[0] != rhs[0] || lhs[1] != rhs[1];
 }
 
 std::ostream &operator<<(std::ostream &os, const myEdge &e) {
@@ -117,6 +128,10 @@ bool operator<(const myFace &lhs, const myFace &rhs) {
 	if (lhs[0] < rhs[0] || (lhs[0] == rhs[0] && lhs[1] < rhs[1]) || (lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] < rhs[2]))
 		return true;
 	return false;
+}
+
+bool operator!=(const myFace &lhs, const myFace &rhs) {
+	return lhs[0] != rhs[0] || lhs[1] != rhs[1] || lhs[2] != rhs[2];
 }
 
 std::ostream &operator<<(std::ostream &os, const myFace &f) {
