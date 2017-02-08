@@ -203,13 +203,13 @@ size_t getShortestDistance(size_t a, size_t b, const vector<size_t> &distance, c
 	return ans;
 }
 
-void processEdges(const vector<Point3D> &points, const DT3 &dt, vector<myEdge> &edges, set<size_t> leaves) {
+void processEdges(const vector<Point3D> &points, const DT3 &dt, vector<myEdge> &edges, set<size_t> leftVerts, const set<myEdge> &coveredEdges) {
 	set<myEdge> usedEdges;
-	for (myEdge e : edges)
-		usedEdges.insert(e);
 	vector<myEdge> allEdges;
 	for (auto e : get_All_Edges(dt, points)) {
-		if (leaves.find(e[0]) != leaves.end() && leaves.find(e[1]) != leaves.end())
+		if (leftVerts.find(e[0]) != leftVerts.end() &&
+			leftVerts.find(e[1]) != leftVerts.end() &&
+			coveredEdges.find(e) == coveredEdges.end())
 			allEdges.push_back(e);
 	}
 
@@ -217,7 +217,7 @@ void processEdges(const vector<Point3D> &points, const DT3 &dt, vector<myEdge> &
 		fprintln(logFile, e);
 	fprintln(logFile, "###########################################################");
 	vector<set<size_t>> adjList = getAdjList(points.size(), allEdges);
-	for (size_t u : leaves) {
+	for (size_t u : leftVerts) {
 		size_t v = SIZE_MAX;
 		double dist = inf;
 		for (size_t tempV : adjList[u]) {
@@ -249,7 +249,7 @@ int testEdges(Point3D a, Point3D b, Point3D c, double length) {
 set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace> &faces, vector<myEdge> &edges) {
 	faces.clear();
 	vector<myEdge> allEdges = get_All_Edges(dt, points);
-	vector<set<size_t>> adjList = getAdjList(points.size(), edges);
+	vector<set<size_t>> adjList = getAdjList(points.size(), edges); //make adj list from mst.
 	vector<myFace> allFaces = get_All_Facets(dt, points);
 	// edges = get_Mst_Edges_Kruskal(points, dt);	//Edges are already of MST
 	vector<vector<size_t>> edgeDegree(allEdges.size());
@@ -258,7 +258,9 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 	double maxEdge = 0;
 	for (myEdge &e : edges)
 		maxEdge = std::max(maxEdge, CGAL::squared_distance(points[e[0]], points[e[1]]));
+
 	set<std::tuple<double, myEdge, size_t>, std::greater<std::tuple<double, myEdge, size_t>>> pq;
+
 	std::sort(allEdges.begin(), allEdges.end());
 	std::sort(allFaces.begin(), allFaces.end());
 	std::sort(edges.begin(), edges.end());
@@ -271,7 +273,7 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 	//fprintln(logFile, i, ":", allFaces[i]);
 	//return;
 	for (size_t i = 0; i < edges.size(); i++) edgesCovered.insert(edges[i]);
-	for (auto elem : edgeDegree) elem.clear();
+	for (auto &elem : edgeDegree) elem.clear();
 	int edgeCondition = 2;
 	for (auto edge : edges) {
 		set<size_t> commonPoints;
@@ -331,11 +333,11 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 				for (int i = 0; i < 3; i++) {
 					size_t u = tri[i], v = tri[(i + 1) % 3];
 					if (u > v) std::swap(u, v);
+					if (u == edge[0] && v == edge[1])
+						continue;
 					set<size_t> commonPoints;
-					std::set_union(
-						adjList[u].begin(), adjList[u].end(),
-						adjList[v].begin(), adjList[v].end(),
-						std::inserter(commonPoints, commonPoints.end()));
+					commonPoints.insert(adjList[u].begin(), adjList[u].end());
+					commonPoints.insert(adjList[v].begin(), adjList[v].end());
 					commonPoints.erase(u);
 					commonPoints.erase(v);
 					for (auto w : commonPoints) {
@@ -392,7 +394,7 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 			fprint(logFile, p);
 		fprintln(logFile);
 		vector<myEdge> tempEdges;
-		processEdges(points, dt, tempEdges, leftVerts);
+		processEdges(points, dt, tempEdges, leftVerts, edgesCovered);
 		for (auto edge : tempEdges) {
 			set<size_t> commonPoints;
 			commonPoints.insert(adjList[edge[0]].begin(), adjList[edge[0]].end());
@@ -451,9 +453,9 @@ int main(int argc, char *argv[]) {
 	std::ofstream outputFile(argv[2]);
 	logFile.open("log.txt");
 	logFile << std::boolalpha;
-	
+
 	DT3 dt;
-	
+
 	vector<Point3D> points;
 	auto start = std::chrono::high_resolution_clock::now();
 	if (!CGAL::read_xyz_points(inputFile, back_inserter(points))) { // output iterator over points
