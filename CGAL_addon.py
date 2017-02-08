@@ -11,6 +11,7 @@ from os import path
 
 addon_keymaps = []
 
+
 def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
@@ -44,6 +45,92 @@ def selectInMesh(obj, selectionType: str, indices: bytes):
 			elements[i].select = True
 
 	bpy.ops.object.editmode_toggle()
+
+
+def loadModelFromFile(outputFile: str, context):
+	scene = context.scene
+
+	for obj in bpy.data.objects:
+		obj.hide = False
+		obj.select = False
+
+	for obj in bpy.data.objects:
+		obj.select = True
+		bpy.ops.object.delete(use_global=False)
+
+	edgeMesh = bmesh.new()  # type: bmesh.BMesh
+	faceMesh = bmesh.new()  # type: bmesh.BMesh
+
+	vertices = []  # type: List[Tuple[float]]
+	edges = []  # type: List[Tuple[int]]
+	faces = []  # type: List[Tuple[int]]
+
+	inputFile = open(outputFile)
+
+	verticesCount = int(inputFile.readline())  # type: int
+	for i in range(verticesCount):
+		vertices.append(list(map(float, inputFile.readline().split())))
+
+	edgesCount = int(inputFile.readline())  # type: int
+	for i in range(edgesCount):
+		edges.append(list(map(int, inputFile.readline().split())))
+
+	facesCount = int(inputFile.readline())  # type: int
+	for i in range(facesCount):
+		faces.append(list(map(int, inputFile.readline().split())))
+
+	if verticesCount > 0:
+		me = bpy.data.meshes.new("Vertex_Mesh")
+		vertexMesh = bmesh.new()  # type: bmesh.BMesh
+		vertexHandle = [vertexMesh.verts.new(i) for i in vertices]
+		vertexMesh.to_mesh(me)
+		vertexMesh.free()
+		obj = bpy.data.objects.new("Model_Vertex", me)
+		scene.objects.link(obj)
+		obj.data.show_edge_seams = True
+		print("Vertex Model Generated")
+
+	if edgesCount > 0:
+		me = bpy.data.meshes.new("Edges_Mesh")
+		edgeMesh = bmesh.new()  # type: bmesh.BMesh
+		vertexHandle = [edgeMesh.verts.new(i) for i in vertices]
+		for edge in edges:
+			edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+
+		edgeMesh.to_mesh(me)
+		edgeMesh.free()
+		obj = bpy.data.objects.new("Model_Edge", me)
+		scene.objects.link(obj)
+		obj.data.show_edge_seams = True
+		# obj.show_x_ray = True
+		print("Edge Model Generated")
+
+	if facesCount > 0:
+		me = bpy.data.meshes.new("Face_Mesh")
+		faceMesh = bmesh.new()  # type: bmesh.BMesh
+		vertexHandle = [faceMesh.verts.new(i) for i in vertices]
+		for face in faces:
+			faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
+		# for face in faces:
+		# 	a = faceMesh.verts.new(vertices[face[0]])
+		# 	b = faceMesh.verts.new(vertices[face[1]])
+		# 	c = faceMesh.verts.new(vertices[face[2]])
+		# 	faceMesh.faces.new((a, b, c))
+
+		for edge in edges:
+			meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+			if meshEdge is None:
+				meshEdge = faceMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
+			meshEdge.seam = True
+
+		faceMesh.to_mesh(me)
+		faceMesh.free()
+		obj = bpy.data.objects.new("Model_Face", me)
+		scene.objects.link(obj)
+		obj.data.show_edge_seams = True
+		print("Face Model Generated")
+
+	return {"FINISHED"}
 
 
 class vertexSelector(Operator):
@@ -147,93 +234,23 @@ class updateModel(Operator):
 
 		if process.returncode == 0:
 			self.report({'INFO'}, "External Program Completed")
-			scene = context.scene
-
-			for obj in bpy.data.objects:
-				obj.hide = False
-				obj.select = False
-
-			for obj in bpy.data.objects:
-				obj.select = True
-				bpy.ops.object.delete(use_global=False)
-
-			edgeMesh = bmesh.new()  # type: bmesh.BMesh
-			faceMesh = bmesh.new()  # type: bmesh.BMesh
-
-			vertices = []  # type: List[Tuple[float]]
-			edges = []  # type: List[Tuple[int]]
-			faces = []  # type: List[Tuple[int]]
-
-			inputFile = open(outputFile)
-
-			verticesCount = int(inputFile.readline())  # type: int
-			for i in range(verticesCount):
-				vertices.append(list(map(float, inputFile.readline().split())))
-
-			edgesCount = int(inputFile.readline())  # type: int
-			for i in range(edgesCount):
-				edges.append(list(map(int, inputFile.readline().split())))
-
-			facesCount = int(inputFile.readline())  # type: int
-			for i in range(facesCount):
-				faces.append(list(map(int, inputFile.readline().split())))
-
-			if verticesCount > 0:
-				me = bpy.data.meshes.new("Vertex_Mesh")
-				vertexMesh = bmesh.new()  # type: bmesh.BMesh
-				vertexHandle = [vertexMesh.verts.new(i) for i in vertices]
-				vertexMesh.to_mesh(me)
-				vertexMesh.free()
-				obj = bpy.data.objects.new("Model_Vertex", me)
-				scene.objects.link(obj)
-				obj.data.show_edge_seams = True
-				print("Vertex Model Generated")
-
-			if edgesCount > 0:
-				me = bpy.data.meshes.new("Edges_Mesh")
-				edgeMesh = bmesh.new()  # type: bmesh.BMesh
-				vertexHandle = [edgeMesh.verts.new(i) for i in vertices]
-				for edge in edges:
-					edgeMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
-
-				edgeMesh.to_mesh(me)
-				edgeMesh.free()
-				obj = bpy.data.objects.new("Model_Edge", me)
-				scene.objects.link(obj)
-				obj.data.show_edge_seams = True
-				# obj.show_x_ray = True
-				print("Edge Model Generated")
-
-			if facesCount > 0:
-				me = bpy.data.meshes.new("Face_Mesh")
-				faceMesh = bmesh.new()  # type: bmesh.BMesh
-				vertexHandle = [faceMesh.verts.new(i) for i in vertices]
-				for face in faces:
-					faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
-				# for face in faces:
-				# 	a = faceMesh.verts.new(vertices[face[0]])
-				# 	b = faceMesh.verts.new(vertices[face[1]])
-				# 	c = faceMesh.verts.new(vertices[face[2]])
-				# 	faceMesh.faces.new((a, b, c))
-
-				for edge in edges:
-					meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
-					if meshEdge == None:
-						meshEdge = faceMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
-					meshEdge.seam = True
-
-				faceMesh.to_mesh(me)
-				faceMesh.free()
-				obj = bpy.data.objects.new("Model_Face", me)
-				scene.objects.link(obj)
-				obj.data.show_edge_seams = True
-				print("Face Model Generated")
-
-			return {"FINISHED"}
+			return loadModelFromFile(outputFile, context)
 		else:
 			self.report({'ERROR'}, stdout + "\n" + stderr)
 			return {"CANCELLED"}
 
+class loadModel(Operator):
+	bl_idname = 'cgal.load_cgal_model'
+	bl_label = 'Load Model'
+	bl_options = {"REGISTER", "UNDO"}
+
+	def execute(self, context: Context):
+		outputFile = context.scene.outputFile
+
+		if bpy.context.active_object != None and bpy.context.active_object.mode == 'EDIT':
+			bpy.ops.object.mode_set(mode='OBJECT')
+
+		return loadModelFromFile(outputFile, context)
 
 # class CGALIntegration(bpy.types.Operator):
 # 	bl_idname = 'mesh.cgal_integration'
@@ -250,12 +267,14 @@ def register():
 	bpy.utils.register_class(edgeModel)
 	bpy.utils.register_class(faceModel)
 	bpy.utils.register_class(updateModel)
+	bpy.utils.register_class(loadModel)
 	bpy.utils.register_class(vertexSelector)
 	bpy.utils.register_class(edgeSelector)
 	bpy.utils.register_class(faceSelector)
 	bpy.utils.register_class(cgalPanel)
 	bpy.types.Scene.inputFile = bpy.props.StringProperty(name="InputFile", subtype='FILE_PATH')
 	bpy.types.Scene.executable = bpy.props.StringProperty(name="Executable", subtype='FILE_PATH')
+	bpy.types.Scene.outputFile = bpy.props.StringProperty(name="OutputFile", subtype='FILE_PATH')
 	bpy.types.Scene.vertsToSelect = bpy.props.StringProperty(name="Vertices", subtype='BYTE_STRING')
 	bpy.types.Scene.edgesToSelect = bpy.props.StringProperty(name="Edges", subtype='BYTE_STRING')
 	bpy.types.Scene.facesToSelect = bpy.props.StringProperty(name="Faces", subtype='BYTE_STRING')
@@ -277,12 +296,14 @@ def unregister():
 	bpy.utils.unregister_class(edgeModel)
 	bpy.utils.unregister_class(faceModel)
 	bpy.utils.unregister_class(updateModel)
+	bpy.utils.unregister_class(loadModel)
 	bpy.utils.unregister_class(vertexSelector)
 	bpy.utils.unregister_class(edgeSelector)
 	bpy.utils.unregister_class(faceSelector)
 	bpy.utils.unregister_class(cgalPanel)
 	del bpy.types.Scene.inputFile
 	del bpy.types.Scene.executable
+	del bpy.types.Scene.outputFile
 	del bpy.types.Scene.vertsToSelect
 	del bpy.types.Scene.edgesToSelect
 	del bpy.types.Scene.facesToSelect
@@ -314,6 +335,13 @@ class cgalPanel(Panel):
 		col.prop(context.scene, 'executable')
 		row = layout.row()
 		row.operator("cgal.update_cgal_model", icon="FILE_REFRESH")
+
+		col = layout.column()
+		col.prop(context.scene, 'outputFile')
+		row = layout.row()
+		row.operator("cgal.load_cgal_model", icon="FILE_REFRESH")
+		
+
 		row = layout.row()
 		row.prop(context.scene, 'vertsToSelect')
 		row.operator("cgal.select_given_vertices", icon="VERTEXSEL")

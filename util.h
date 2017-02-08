@@ -2,9 +2,24 @@
 #define UTIL_H
 
 #include <algorithm>
-#include <array>
+#include <fstream>
+#include <limits>
+#include <chrono>
 #include <vector>
+#include <queue>
+#include <array>
+#include <cmath>
 #include <map>
+
+// Uncovering some classes from std
+using std::vector;
+using std::string;
+using std::array;
+using std::pair;
+using std::cerr;
+using std::cout;
+using std::map;
+using std::set;
 
 #define val(x) #x "=", x
 

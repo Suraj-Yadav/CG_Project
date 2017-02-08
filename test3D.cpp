@@ -4,34 +4,18 @@
 #include <CGAL/IO/read_xyz_points.h>
 #include <CGAL/Union_find.h>
 
-#include <iostream>
-#include <fstream>
-#include <limits>
-#include <chrono>
-#include <queue>
-#include <cmath>
-#include <map>
-
 #include "util.h"
 
-//using namespace std;
-using std::vector;
-using std::set;
-using std::pair;
-using std::array;
-using std::map;
-using std::cerr;
-using std::cout;
-
+// Alias for CGAL datatypes
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_3 Point3D;
 typedef Kernel::Vector_3 Vector3D;
 typedef Kernel::Segment_3 Segment3D;
 typedef Kernel::Triangle_3 Triangle3D;
 typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
-
 const double inf = std::numeric_limits<double>::infinity();
 
+// logFile for debugging
 std::ofstream logFile;
 
 vector<myFace> get_All_Facets(const DT3 &dt, const vector<Point3D> &points) {
@@ -42,6 +26,7 @@ vector<myFace> get_All_Facets(const DT3 &dt, const vector<Point3D> &points) {
 								   getIndex(points, tri[1]),
 								   getIndex(points, tri[2])));
 	}
+
 	return allFacets;
 }
 
@@ -52,6 +37,7 @@ vector<myEdge> get_All_Edges(const DT3 &dt, const vector<Point3D> &points) {
 		allEdges.push_back(myEdge(getIndex(points, seg[0]),
 								  getIndex(points, seg[1])));
 	}
+
 	return allEdges;
 }
 
@@ -59,10 +45,8 @@ vector<myEdge> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3 &d
 	vector<CGAL::Union_find<size_t>::handle> handle;
 	CGAL::Union_find<size_t> uf;
 	handle.reserve(points.size());
-
 	for (size_t i = 0; i < points.size(); i++)
 		handle.push_back(uf.make_set(i));
-
 	vector<std::tuple<double, size_t, size_t>> allEdges;
 	for (auto edge : get_All_Edges(dt, points)) {
 		allEdges.push_back(std::make_tuple(CGAL::squared_distance(points[edge[0]], points[edge[1]]), edge[0], edge[1]));
@@ -71,7 +55,6 @@ vector<myEdge> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3 &d
 	sort(allEdges.begin(),
 		 allEdges.end(),
 		 [](std::tuple<double, size_t, size_t> &a, std::tuple<double, size_t, size_t> &b) -> bool { return get<0>(a) < get<0>(b); });
-
 	vector<myEdge> mst;
 	for (auto edge : allEdges) {
 		auto u = get<1>(edge), v = get<2>(edge);
@@ -80,14 +63,13 @@ vector<myEdge> get_Mst_Edges_Kruskal(const vector<Point3D> &points, const DT3 &d
 			uf.unify_sets(handle[u], handle[v]);
 		}
 	}
+
 	return mst;
 }
 
 vector<myEdge> get_Mst_Edges_Prim(const vector<Point3D> &points, const DT3 &dt) {
 	vector<vector<pair<size_t, double>>> adjList;
-
 	vector<myEdge> mst;
-
 	adjList.resize(points.size());
 	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
 		auto edge = dt.segment(*edgeItr);
@@ -101,11 +83,9 @@ vector<myEdge> get_Mst_Edges_Prim(const vector<Point3D> &points, const DT3 &dt) 
 	vector<bool> inPQ(points.size(), true);
 	vector<size_t> parent(points.size(), SIZE_MAX);
 	set<pair<double, size_t>> pq;
-
 	weight[0] = 0;
 	for (size_t i = 0; i < points.size(); i++)
 		pq.insert({weight[i], i});
-
 	//while (!pq.empty()) {
 	for (size_t i = 0; i < points.size(); i++) {
 		//size_t u = pq.begin()->second;
@@ -125,6 +105,7 @@ vector<myEdge> get_Mst_Edges_Prim(const vector<Point3D> &points, const DT3 &dt) 
 			}
 		}
 	}
+
 	return mst;
 }
 
@@ -169,12 +150,14 @@ bool validToAdd(const vector<Point3D> &points, const vector<size_t> &edgeDegree,
 		angle = 180 * std::acos(angle) / M_PI;
 		fprintln(logFile, "Angle between the face (", edge[0], edge[1], edgeDegree.back(), ") and (", edge[0], edge[1], newPoint, ") is", angle);
 	}
+
 	if (!ans && debug) {
 		fprint(logFile, "Problem Adding ", newPoint, "to", edge, ". edgedegree={");
 		for (size_t p : edgeDegree)
 			fprint(logFile, p);
 		fprintln(logFile, "}");
 	}
+
 	return ans;
 }
 
@@ -184,6 +167,7 @@ vector<set<size_t>> getAdjList(size_t pointsCount, const vector<myEdge> &edges) 
 		adjList[edge[0]].insert(edge[1]);
 		adjList[edge[1]].insert(edge[0]);
 	}
+
 	return adjList;
 }
 
@@ -204,6 +188,7 @@ size_t findCenterNode(vector<set<size_t>> adjList) {
 			}
 		}
 	}
+
 	return lastPushed;
 }
 
@@ -222,7 +207,6 @@ void processEdges(const vector<Point3D> &points, const DT3 &dt, vector<myEdge> &
 	set<myEdge> usedEdges;
 	for (myEdge e : edges)
 		usedEdges.insert(e);
-
 	vector<myEdge> allEdges;
 	for (auto e : get_All_Edges(dt, points)) {
 		if (leaves.find(e[0]) != leaves.end() && leaves.find(e[1]) != leaves.end())
@@ -242,15 +226,18 @@ void processEdges(const vector<Point3D> &points, const DT3 &dt, vector<myEdge> &
 				dist = CGAL::squared_distance(points[u], points[tempV]);
 			}
 		}
+
 		if (v != SIZE_MAX && usedEdges.find(myEdge(u, v)) == usedEdges.end()) {
 			usedEdges.insert(myEdge(u, v));
 			fprintln(logFile, myEdge(u, v));
 		}
 	}
+
 	edges.clear();
 	for (myEdge e : usedEdges)
 		edges.push_back(e);
 }
+
 int testEdges(Point3D a, Point3D b, Point3D c, double length) {
 	int ans = 0;
 	if (CGAL::squared_distance(a, b) <= length) ans++;
@@ -264,41 +251,28 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 	vector<myEdge> allEdges = get_All_Edges(dt, points);
 	vector<set<size_t>> adjList = getAdjList(points.size(), edges);
 	vector<myFace> allFaces = get_All_Facets(dt, points);
-
 	// edges = get_Mst_Edges_Kruskal(points, dt);	//Edges are already of MST
-
 	vector<vector<size_t>> edgeDegree(allEdges.size());
-
 	set<myFace> trianglesCovered;
 	set<myEdge> edgesCovered;
-
 	double maxEdge = 0;
 	for (myEdge &e : edges)
 		maxEdge = std::max(maxEdge, CGAL::squared_distance(points[e[0]], points[e[1]]));
-
 	set<std::tuple<double, myEdge, size_t>, std::greater<std::tuple<double, myEdge, size_t>>> pq;
-
 	std::sort(allEdges.begin(), allEdges.end());
 	std::sort(allFaces.begin(), allFaces.end());
 	std::sort(edges.begin(), edges.end());
-
 	//for (myEdge edge : allEdges)
 	//fprintln(logFile, edge);
-
 	//for (size_t i = 0; i < allEdges.size(); i++)
 	//fprintln(logFile, i, ":", allEdges[i]);
-
 	//fprintln(logFile);
-
 	//for (size_t i = 0; i < allFaces.size(); i++)
 	//fprintln(logFile, i, ":", allFaces[i]);
 	//return;
-
 	for (size_t i = 0; i < edges.size(); i++) edgesCovered.insert(edges[i]);
 	for (auto elem : edgeDegree) elem.clear();
-
 	int edgeCondition = 2;
-
 	for (auto edge : edges) {
 		set<size_t> commonPoints;
 		commonPoints.insert(adjList[edge[0]].begin(), adjList[edge[0]].end());
@@ -314,7 +288,6 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 	}
 
 	set<size_t> leftVerts;
-
 	while (edgeCondition >= 0) {
 		while (!pq.empty()) {
 			auto element = *pq.begin();
@@ -329,10 +302,10 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 				fprintln(logFile, val(edgeDegree[edgeIndex].size() == 2));
 				continue;
 			}
+
 			myEdge newEdge1(edge[0], point), newEdge2(edge[1], point);
 			size_t newEdgeIndex1 = getIndex(allEdges, newEdge1),
 				   newEdgeIndex2 = getIndex(allEdges, newEdge2);
-
 			if (trianglesCovered.find(tri) == trianglesCovered.end() &&
 				validToAdd(points, edgeDegree[newEdgeIndex1], newEdge1, edge[1]) &&
 				validToAdd(points, edgeDegree[newEdgeIndex2], newEdge2, edge[0]) &&
@@ -341,29 +314,23 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 				fprintln(logFile, ": Accepted");
 				edgesCovered.insert(newEdge1);
 				edgesCovered.insert(newEdge2);
-
 				edgeDegree[newEdgeIndex1].push_back(edge[1]);
 				edgeDegree[newEdgeIndex2].push_back(edge[0]);
 				edgeDegree[edgeIndex].push_back(point);
 				fprintln(logFile, "Added", edge[1], "to", newEdge1, "which has index", newEdgeIndex1);
 				fprintln(logFile, "Added", edge[0], "to", newEdge2, "which has index", newEdgeIndex2);
 				fprintln(logFile, "Added", point, "to", edge, "which has index", edgeIndex);
-
 				trianglesCovered.insert(tri);
 				faces.push_back(tri);
-
 				adjList[edge[0]].insert(edge[1]);
 				adjList[edge[0]].insert(point);
 				adjList[edge[1]].insert(edge[0]);
 				adjList[edge[1]].insert(point);
 				adjList[point].insert(edge[0]);
 				adjList[point].insert(edge[1]);
-
 				for (int i = 0; i < 3; i++) {
 					size_t u = tri[i], v = tri[(i + 1) % 3];
-
 					if (u > v) std::swap(u, v);
-
 					set<size_t> commonPoints;
 					std::set_union(
 						adjList[u].begin(), adjList[u].end(),
@@ -371,7 +338,6 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 						std::inserter(commonPoints, commonPoints.end()));
 					commonPoints.erase(u);
 					commonPoints.erase(v);
-
 					for (auto w : commonPoints) {
 						myFace tempTri(u, v, w);
 						myEdge tempEdge(u, v);
@@ -382,6 +348,7 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 					}
 				}
 			}
+
 			else {
 				fprintln(logFile, ": Rejected");
 				fprintln(logFile, val(edge));
@@ -411,6 +378,7 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 				}
 			}
 		}
+
 		edgeCondition--;
 		leftVerts.clear();
 		for (size_t i = 0; i < allEdges.size(); i++) {
@@ -424,7 +392,6 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 			fprint(logFile, p);
 		fprintln(logFile);
 		vector<myEdge> tempEdges;
-
 		processEdges(points, dt, tempEdges, leftVerts);
 		for (auto edge : tempEdges) {
 			set<size_t> commonPoints;
@@ -440,6 +407,7 @@ set<size_t> process(const vector<Point3D> &points, const DT3 &dt, vector<myFace>
 			}
 		}
 	}
+
 	return leftVerts;
 }
 
@@ -470,38 +438,34 @@ void writeForBlend(std::ofstream &outputFile, const vector<Point3D> &points, con
 }
 
 int main(int argc, char *argv[]) {
+	cout << "Input File = " << argv[2] << "\n";
+	string logFilePath(argv[2]);
+	println(logFilePath.substr(0, logFilePath.find_last_of('\\')));
 
 	if (argc != 3) {
 		cerr << "Invalid Argument\n";
 		return 1;
 	}
 
-	cout << "Input File = " << argv[1] << "\n";
-
 	std::ifstream inputFile(argv[1]);
 	std::ofstream outputFile(argv[2]);
-	logFile.open("G:/work/CG_Project/build/log.txt");
+	logFile.open("log.txt");
 	logFile << std::boolalpha;
-
+	
 	DT3 dt;
-
+	
 	vector<Point3D> points;
-
 	auto start = std::chrono::high_resolution_clock::now();
 	if (!CGAL::read_xyz_points(inputFile, back_inserter(points))) { // output iterator over points
 		cerr << "Error: cannot read file.";
 		return 1;
 	}
-
 	sortAndRemoveDuplicate(points);
 
 	auto finish = std::chrono::high_resolution_clock::now();
 	// cout << points.size() << " points read in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-
 	start = std::chrono::high_resolution_clock::now();
-
 	dt.insert(points.begin(), points.end());
-
 	if (!dt.is_valid(true)) {
 		cerr << "Error: fail to build a Delaunay triangulation.\n";
 		return 1;
@@ -513,22 +477,17 @@ int main(int argc, char *argv[]) {
 	finish = std::chrono::high_resolution_clock::now();
 	// cout << "Delaunay Triangulation created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
 	cout << points.size() << " " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-
 	vector<myEdge> edges;
 	vector<myFace> faces;
-
 	start = std::chrono::high_resolution_clock::now();
 	//edges = get_Mst_Edges_Prim(points, dt);
 	edges = get_Mst_Edges_Kruskal(points, dt);
 	finish = std::chrono::high_resolution_clock::now();
 	// cout << "Kruskal MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-
 	/*double len = 0;
 	for (auto edge : edges)
 		len = std::max(len, edge.squared_length());
-
 	edges = get_All_Edges(dt);*/
-
 	start = std::chrono::high_resolution_clock::now();
 	set<size_t> p;
 	//size_t lastSize = 0;
@@ -540,45 +499,40 @@ int main(int argc, char *argv[]) {
 	// 	lastSize = p.size();
 	// processEdges(points, dt, edges, p);
 	// }
+
 	finish = std::chrono::high_resolution_clock::now();
 	cout << points.size() << " " << std::chrono::duration<double>(finish - start).count() << "\n";
-
 	//start = chrono::high_resolution_clock::now();
 	//auto mst2 = get_Mst_Edges_Prim(points, dt);
 	//finish = chrono::high_resolution_clock::now();
 	//cout << "Prim MST created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-
 	//if (mst1.size() != mst2.size()) {
 	//	cerr << "Size Different : Kruskal = " << mst1.size() << ", Prim = " << mst2.size() << "\n";
 	//	return 1;
 	//}
 
 	start = std::chrono::high_resolution_clock::now();
-
 	edges.clear();
-
-	// writeForBlend(outputFile, points, edges, faces);
-
+	writeForBlend(outputFile, points, edges, faces);
 	finish = std::chrono::high_resolution_clock::now();
 	// cout << "Output created in " << std::chrono::duration<double>(finish - start).count() << " secs\n";
-
 	/*fprintln(logFile, "___________________________MST edge lengths____________________");
 	for (auto e : edges)
 		fprintln(logFile, CGAL::sqrt(CGAL::squared_distance(points[e[0]], points[e[1]])));
 	fprintln(logFile, "_______________________________________________________________");
-
 	fprintln(logFile, "_______________________Triangle Edge lengths___________________");
 	for (auto f : faces) {
 		fprintln(logFile, CGAL::sqrt(CGAL::squared_distance(points[f[0]], points[f[1]])));
 		fprintln(logFile, CGAL::sqrt(CGAL::squared_distance(points[f[1]], points[f[2]])));
 		fprintln(logFile, CGAL::sqrt(CGAL::squared_distance(points[f[0]], points[f[2]])));
 	}
-	fprintln(logFile, "_______________________________________________________________");
 
+	fprintln(logFile, "_______________________________________________________________");
 	fprintln(logFile, "________________________Triangle Perimeter_____________________");
 	for (auto f : faces) {
 		fprintln(logFile, CGAL::sqrt(CGAL::squared_distance(points[f[0]], points[f[1]])) + CGAL::sqrt(CGAL::squared_distance(points[f[1]], points[f[2]])) + CGAL::sqrt(CGAL::squared_distance(points[f[0]], points[f[2]])));
 	}
+
 	fprintln(logFile, "_______________________________________________________________");*/
 	return 0;
 }
