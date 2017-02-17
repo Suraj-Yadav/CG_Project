@@ -31,7 +31,7 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 	
 	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 	set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-	
+
 	#-----------------------------------
 	# Intersection.cpp
 	#-----------------------------------
@@ -59,6 +59,43 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(test3D ${CGAL_LIBRARIES})
 		set_target_properties( test3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# surface3D.cpp
+	#-----------------------------------
+		add_executable( surface3D surface3D.cpp util.h)
+		set_property(TARGET surface3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET surface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(surface3D ${CGAL_LIBRARIES})
+		set_target_properties( surface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# psurface3D.cpp
+	#-----------------------------------
+		add_executable( psurface3D psurface3D.cpp util.h)
+		set_property(TARGET psurface3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET psurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(psurface3D ${CGAL_LIBRARIES})
+		set_target_properties( psurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# ssurface3D.cpp
+	#-----------------------------------
+		add_executable( ssurface3D ssurface3D.cpp util.h)
+		set_property(TARGET ssurface3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET ssurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(ssurface3D ${CGAL_LIBRARIES})
+		set_target_properties( ssurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# memTest3D.cpp
+	#-----------------------------------
+		add_executable( memTest3D memTest3D.cpp util.h)
+		set_property(TARGET memTest3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET memTest3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(memTest3D ${CGAL_LIBRARIES})
+		set_target_properties( memTest3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	
 	#-----------------------------------
 	# assignment.cpp
 	#-----------------------------------

@@ -6,6 +6,6 @@ MSBuild /p:Configuration=Release test3D.vcxproj
 
 cmake -G "Visual Studio 14 2015 Win64"
 
-forfiles /P ..\input_3D /M *.xyz /c "cmd /C ..\build\Release\test1.exe @file ..\build\output.txt" > log.txt 2>&1
+forfiles /P ..\input_3D /M *.xyz /c "cmd /C ..\build\Release\surface3D.exe @file ..\build\output.txt" > log.txt 2>&1
 
 RMDIR /S /Q .

@@ -38,20 +38,20 @@ typedef CGAL::Delaunay_triangulation_2<Kernel> Delaunay;
 using namespace std;
 
 template <typename T>
-size_t getIndex(const vector<T> &v, const T &elem) {
+int getIndex(const vector<T> &v, const T &elem) {
 	return lower_bound(v.begin(), v.end(), elem) - v.begin();
 }
 
 
 vector<Segment2D> get_Mst_Edges_Kruskal(const vector<Point2D> &points, const Delaunay &dt) {
-	vector<CGAL::Union_find<size_t>::handle> handle;
-	CGAL::Union_find<size_t> uf;
+	vector<CGAL::Union_find<int>::handle> handle;
+	CGAL::Union_find<int> uf;
 	handle.reserve(points.size());
 
-	for (size_t i = 0; i < points.size(); i++)
+	for (int i = 0; i < points.size(); i++)
 		handle.push_back(uf.make_set(i));
 
-	vector<tuple<double, size_t, size_t>> allEdges;
+	vector<tuple<double, int, int>> allEdges;
 	for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
 		auto edge = dt.segment(*edgeItr);
 		auto u = getIndex(points, edge.start()),
@@ -61,7 +61,7 @@ vector<Segment2D> get_Mst_Edges_Kruskal(const vector<Point2D> &points, const Del
 
 	sort(allEdges.begin(),
 		allEdges.end(),
-		[](tuple<double, size_t, size_t> &a, tuple<double, size_t, size_t> &b) -> bool { return get<0>(a) < get<0>(b); });
+		[](tuple<double, int, int> &a, tuple<double, int, int> &b) -> bool { return get<0>(a) < get<0>(b); });
 
 	vector<Segment2D> mst;
 

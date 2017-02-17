@@ -1,0 +1,73 @@
+// score of a triangle is max of cosine of each angle in a triangle
+
+update_pq(){
+	
+	for each edge(u,v) in edgesCovered{
+		commonPoints = adj vertices of u + adj vertices of v - u - v		
+		for each point in commmonPoint{
+			score = getscore(edge, point)
+			if((u,v,point) in DT) && satisfies edgeCondition)
+				pq.insert(score, edge, point);
+		}
+	}
+}
+
+validtoAdd(face){
+	for each edge in face{
+		if degree of edge is 2 then 
+			return false;
+		if degree of edge is 1 and angle between this face and another face with same edge is less than 90 then 
+			return false;
+	}
+	return true;
+}
+ 
+reconstruct (points3D, DT3, MSTedges){
+
+	adjList = getAdjList(MSTedges);					// Adj List of current surface
+	edgeDegree = adj list of each edge;
+
+	trianglesCovered = set of covered faces;
+
+	edgesCovered = set of covered edges;			// Put MST edges in the beginning
+
+	pq = priority queue (key = score of face, value = edge and opposite point);
+
+	edgeCondition = 2; 								// Our Special condition
+
+	update_pq();
+
+	while(edgeCondition >= 0){
+		while(pq is not empty){
+			face = pq.pop();
+			if edge in face has degree 2
+				continue;
+			
+			count = count of edge lengths longer than maxlength in current graph
+			
+			if ((face not in trianglesCovered) && validtoAdd(face) && count > edgeCondition) {
+				
+				add two new edges to adjList and update edgeDegree;
+				add new face to trianglesCovered;		
+				
+				update pq by adding possible faces obtained by adding new edges;
+			}
+		}
+		
+		edgeCondition--;
+		
+		holes = subgraph of current surface with degree 1 edges;
+		
+		for each vertex in holes
+			newEdges.add(minimul length edge(in holes) from vertex that is a delaunay edge)
+
+		update_pq(newEdges);	
+	}
+		
+	return trianglesCovered;
+}	
+		
+			
+		
+
+			
