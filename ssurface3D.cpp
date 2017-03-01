@@ -1,5 +1,4 @@
 #define _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Delaunay_triangulation_3.h>
 #include <CGAL/IO/read_xyz_points.h>
@@ -14,6 +13,7 @@ typedef Kernel::Vector_3 Vector3D;
 typedef Kernel::Segment_3 Segment3D;
 typedef Kernel::Triangle_3 Triangle3D;
 typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
+typedef Kernel::Plane_3 Plane3D;
 const double inf = std::numeric_limits<double>::infinity();
 
 vector<ourEdge> get_All_Edges(const DT3 &dt, const vector<Point3D> &points) {
@@ -23,41 +23,23 @@ vector<ourEdge> get_All_Edges(const DT3 &dt, const vector<Point3D> &points) {
 		allEdges.push_back(ourEdge(getIndex(points, seg[0]),
 								   getIndex(points, seg[1])));
 	}
-
 	return allEdges;
 }
 
-/**********************************************************************************************/ /**
- * @fn	vector<ourEdge> getMstEdges(const vector<Point3D> &points, const DT3 &dt)
- *
- * @brief	Gets MST edges using Kruskal's Algorithm.
- *
- * @param	points	The input points.
- * @param	dt	  	The Delaunay triangulation of the points.
- *
- * @return	The MST edges.
- **************************************************************************************************/
-
-vector<ourEdge> getMstEdges(const vector<Point3D> &pts, const vector<set<int>> &dtAdjList) {
+vector<ourEdge> getMstEdges(const vector<Point3D> &points, const DT3 &dt) {
 	vector<CGAL::Union_find<int>::handle> handle;
-	handle.reserve(pts.size());
-
 	CGAL::Union_find<int> uf;
-
-	for (int i = 0; i < pts.size(); i++)
+	handle.reserve(points.size());
+	for (int i = 0; i < points.size(); i++)
 		handle.push_back(uf.make_set(i));
-
 	vector<std::tuple<double, int, int>> allEdges;
-
-	for (int u = 0; u < pts.size(); ++u) {
-		for (int v : dtAdjList[u])
-			if (u < v) {
-				allEdges.push_back(std::make_tuple(CGAL::squared_distance(pts[u], pts[v]), u, v));
-			}
+	for (auto edge : get_All_Edges(dt, points)) {
+		allEdges.push_back(std::make_tuple(CGAL::squared_distance(points[edge[0]], points[edge[1]]), edge[0], edge[1]));
 	}
 
-	sort(allEdges.begin(), allEdges.end());
-
+	sort(allEdges.begin(),
+		allEdges.end(),
+		[](std::tuple<double, int, int> &a, std::tuple<double, int, int> &b) -> bool { return get<0>(a) < get<0>(b); });
 	vector<ourEdge> mst;
 	for (auto edge : allEdges) {
 		auto u = get<1>(edge), v = get<2>(edge);
@@ -98,12 +80,6 @@ class SurfaceReconstruct {
 	/** @brief	Delaunay triangulation. */
 	DT3 dt;
 
-	/** @brief	Handles for referencing points. */
-	vector<DT3::Vertex_handle> ptsHandle;
-
-	/** @brief	File for logs. */
-	std::ofstream logFile;
-
 	/** @brief	Validity of Model. */
 	bool valid;
 
@@ -116,26 +92,13 @@ class SurfaceReconstruct {
 	/** @brief	Faces of the Final Model.  */
 	set<ourFace> modelFaces;
 
-	/** @brief	Adjacency List for Delaunay. */
-	vector<set<int>> dtAdjList;
-
 	/** @brief	Face Degree of Edges. */
 	map<ourEdge, vector<int>> edgeDegree;
 
 	/** @brief	The length of longest edge in MST. */
 	double maxEdge;
 
-	vector<vector<set<ourFace>::iterator>> vertFaces;
-
-	/**********************************************************************************************/ /**
-	 * @fn	bool isFaceDelaunay(ourFace face)
-	 *
-	 * @brief	Query if 'face' is part of delaunay.
-	 *
-	 * @param	face	The face.
-	 *
-	 * @return	True if face is delaunay, false if not.
-	 **************************************************************************************************/
+	vector<vector<set<ourEdge>::iterator>> vertAdjEdges;
 
 	bool isFaceDelaunay(const ourFace &face) {
 
@@ -149,18 +112,7 @@ class SurfaceReconstruct {
 		//return
 	}
 
-	/**********************************************************************************************/ /**
-	 * @fn	bool validToAdd(const ourEdge &edge, int newPoint)
-	 *
-	 * @brief	Valid to add.
-	 *
-	 * @param	edge		The edge.
-	 * @param	newPoint	The new point.
-	 *
-	 * @return	True if it succeeds, false if it fails.
-	 **************************************************************************************************/
-
-	bool validToAdd(const ourEdge &edge, int newPoint) {
+	bool validToAdd(ourEdge edge, int newPoint) {
 		auto &edgeDeg = edgeDegree[edge];
 		if (edgeDeg.size() == 2)
 			return false;
@@ -193,51 +145,15 @@ class SurfaceReconstruct {
 		//}
 	}
 
-	/**********************************************************************************************/ /**
-	 * @fn	vector<int> bfs(int start, map<int, bool> &verts, const vector<set<int>> &currAdjList)
-	 *
-	 * @brief	Find Connected Vertices present in verts using BFS.
-	 *
-	 * @param 		  	start	   	start.
-	 * @param [in,out]	verts	   	vertices.
-	 * @param 		  	currAdjList	Adjacency List.
-	 *
-	 * @return	A vector&lt;int&gt;
-	 **************************************************************************************************/
-
-	set<int> bfs(int start, map<int, bool> &verts, const vector<set<int>> &currAdjList) {
-		set<int> connected;
-		verts[start] = true;
-		std::queue<int> Q;
-		Q.push(start);
-		while (!Q.empty()) {
-			int u = Q.front();
-			Q.pop();
-			connected.insert(u);
-			for (auto &v : currAdjList[u]) {
-				cout << u << "->" << v << std::endl;
-				if (verts.find(v) != verts.end() && !verts[v]) {
-					verts[v] = true;
-					Q.push(v);
-				}
-			}
-		}
-		return connected;
+	double getAngleScore(int u, int v, int w) {
+		Point3D a = pts[u], b = pts[v], c = pts[w];
+		Vector3D AB(a, b), BC(b, c);
+		AB = AB / std::sqrt(AB.squared_length());
+		BC = BC / std::sqrt(BC.squared_length());
+		return -AB * BC;
 	}
 
-	/**********************************************************************************************/ /**
-	 * @fn	double getScore(int u, int v, int w)
-	 *
-	 * @brief	Gets the score of the triangle formed by points u,v,w.
-	 *
-	 * @param	u	Point 1.
-	 * @param	v	Point 2.
-	 * @param	w	Point 3.
-	 *
-	 * @return	The score.
-	 **************************************************************************************************/
-
-	double getScore(int u, int v, int w) {
+	double getTriScore(int u, int v, int w) {
 		Point3D a = pts[u], b = pts[v], c = pts[w];
 		Vector3D AB(a, b), AC(a, c), BC(b, c);
 		AB = AB / std::sqrt(AB.squared_length());
@@ -249,27 +165,14 @@ class SurfaceReconstruct {
 		return score;
 	}
 
-	/**********************************************************************************************/ /**
-	 * @fn	vector<pair<double, int>> getFacesFromEdge(const ourEdge &edge, const vector<set<int>> &currAdjList)
-	 *
-	 * @brief	Gets Possible faces from edges.
-	 *
-	 * @param	edge	   	The edge.
-	 * @param	currAdjList	current Adjacency List.
-	 *
-	 * @return	The faces from edges.
-	 **************************************************************************************************/
-
 	vector<pair<int, double>> getFacesFromEdge(const ourEdge &edge, const vector<set<int>> &currAdjList, int edgeCondition) {
 		vector<pair<int, double>> elems;
 		for (auto &point : currAdjList[edge[0]]) {
-			if (edge[0] == 22 && edge[1] == 37 && point == 24)
-				cout << (point != edge[1]) << " " << isFaceDelaunay(ourFace(point, edge[0], edge[1])) << " " << (modelFaces.find(ourFace(point, edge[0], edge[1])) == modelFaces.end()) << " " << (testEdges(pts[edge[0]], pts[edge[1]], pts[point], maxEdge) >= edgeCondition) << std::endl;
 			if (point != edge[1] &&
 				isFaceDelaunay(ourFace(point, edge[0], edge[1])) &&
 				modelFaces.find(ourFace(point, edge[0], edge[1])) == modelFaces.end() &&
 				testEdges(pts[edge[0]], pts[edge[1]], pts[point], maxEdge) >= edgeCondition) {
-				elems.push_back(std::make_pair(point, getScore(point, edge[0], edge[1])));
+				elems.push_back(std::make_pair(point, getTriScore(point, edge[0], edge[1])));
 			}
 		}
 		for (auto &point : currAdjList[edge[1]]) {
@@ -277,7 +180,7 @@ class SurfaceReconstruct {
 				isFaceDelaunay(ourFace(point, edge[0], edge[1])) &&
 				modelFaces.find(ourFace(point, edge[0], edge[1])) == modelFaces.end() &&
 				testEdges(pts[edge[0]], pts[edge[1]], pts[point], maxEdge) >= edgeCondition) {
-				elems.push_back(std::make_pair(point, getScore(point, edge[0], edge[1])));
+				elems.push_back(std::make_pair(point, getTriScore(point, edge[0], edge[1])));
 			}
 		}
 		sortAndRemoveDuplicate(elems);
@@ -285,42 +188,22 @@ class SurfaceReconstruct {
 	}
 
 	bool isEdgeOverlap(const ourEdge &e) {
-		cout << "testing " << e << std::endl;
-		ourFace face(0, 1, 2);
+		//cout << "testing " << e << std::endl;
+		ourEdge edge(0, 1);
 		for (int i = 0; i < 2; ++i) {
-			for (auto &elem : vertFaces[e[i]]) {
-				face = *elem;
-				cout << "with " << face << " " << std::endl;
-				Triangle3D tri1(pts[face[0]], pts[face[1]], pts[face[2]]);
-				auto d = tri1.supporting_plane().projection(pts[e[!i]]);
-				Triangle3D tri2(pts[e[i]], pts[e[!i]], d + (d - pts[e[!i]]));
-
-				cout << "T1 = " << tri1 << std::endl;
-				cout << "T2 = " << tri2 << std::endl;
-
-				if (d == pts[e[!i]])
-					cout << "degenerate" << std::endl;
-				auto result = intersection(tri1, tri2);
-				if (result) {
-					if (const Segment3D *s = boost::get<Segment3D>(&*result)) {
-						std::cout << *s << std::endl;
-					}
-					else {
-						const Point3D *p = boost::get<Point3D>(&*result);
-						std::cout << *p << std::endl;
-					}
-				}
-				else {
-					std::cout << "Nope" << std::endl;
-				}
-				if (result) {
-					if (const Segment3D *s = boost::get<Segment3D>(&*result))
-						if (s->squared_length() > (0.01 * CGAL::squared_distance(d, pts[e[i]])))
-							return true;
-				}
+			for (auto &elem : vertAdjEdges[e[i]]) {
+				edge = *elem;
+				//cout << "with " << edge << " " << std::endl;
+				Point3D a = pts[edge[0]], b = pts[edge[1]], c, o = pts[e[i]];
+				Plane3D plane(a, b, o);
+				c = plane.projection(pts[e[!i]]);
+				auto d1 = CGAL::cross_product(a - o, c - o) * CGAL::cross_product(a - o, b - o),
+					 d2 = CGAL::cross_product(b - o, c - o) * CGAL::cross_product(b - o, a - o);
+				if (d1 > 0 && d2 > 0)
+					return true;
 			}
 		}
-		cout << "pass" << std::endl;
+		//cout << "pass" << std::endl;
 		return false;
 	}
 
@@ -336,64 +219,224 @@ class SurfaceReconstruct {
 			return newEdges;
 		}
 
-		vector<ourEdge> allEdges;
-		for (auto e : get_All_Edges(dt, pts)) {
-			if (hole.find(e[0]) != hole.end() &&
-				hole.find(e[1]) != hole.end() &&
-				modelEdges.find(e) == modelEdges.end())
-				allEdges.push_back(e);
-		}
-		std::sort(allEdges.begin(), allEdges.end());
-		cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		for (auto &e : allEdges) {
-			cout << e << std::endl;
-		}
-		cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		vector<set<int>> adjList = getAdjList(pts.size(), allEdges);
-		for (int u : hole) {
-			int v = -1;
-			double dist = inf;
-			for (int tempV : adjList[u]) {
-				if (!isEdgeOverlap(ourEdge(u, tempV)) && dist > CGAL::squared_distance(pts[u], pts[tempV])) {
-					v = tempV;
-					dist = CGAL::squared_distance(pts[u], pts[tempV]);
-				}
-			}
+		// vector<ourEdge> allEdges;
+		// for (auto e : get_All_Edges(dt, pts)) {
+		// 	if (hole.find(e[0]) != hole.end() &&
+		// 		hole.find(e[1]) != hole.end() &&
+		// 		modelEdges.find(e) == modelEdges.end())
+		// 		allEdges.push_back(e);
+		// }
+		// std::sort(allEdges.begin(), allEdges.end());
+		// cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
+		// for (auto &e : allEdges) {
+		// 	cout << e << std::endl;
+		// }
+		// cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;*/
+		// vector<set<int>> adjList = getAdjList(pts.size(), allEdges);
+		// for (int u : hole) {
+		// 	int v = -1;
+		// 	double dist = inf;
+		// 	for (int tempV : adjList[u]) {
+		// 		if (!isEdgeOverlap(ourEdge(u, tempV)) && dist > CGAL::squared_distance(pts[u], pts[tempV])) {
+		// 			v = tempV;
+		// 			dist = CGAL::squared_distance(pts[u], pts[tempV]);
+		// 		}
+		// 	}
 
-			if (v != -1 && newEdges.find(ourEdge(u, v)) == newEdges.end()) {
-				newEdges.insert(ourEdge(u, v));
-				// fprintln(logFile, ourEdge(u, v));
-			}
-		}
-
-		/*for (auto &u : hole) {
-			int minV = SIZE_MAX;
+		// 	if (v != -1 && newEdges.find(ourEdge(u, v)) == newEdges.end()) {
+		// 		newEdges.insert(ourEdge(u, v));
+		// 		// fprintln(logFile, ourEdge(u, v));
+		// 	}
+		// }
+		for (auto &u : hole) {
+			int minV = -1;
+			
 			double dist = inf;
 			for (auto &v : hole) {
 				if (u >= v)
 					continue;
 				if (dist > CGAL::squared_distance(pts[u], pts[v]) &&
 					newEdges.find(ourEdge(u, v)) == newEdges.end() &&
+					!isEdgeOverlap(ourEdge(u, v)) &&
 					(hole.size() <= 3 || currAdjList[u].find(v) == currAdjList[u].end())) {
 					minV = v;
 					dist = CGAL::squared_distance(pts[u], pts[v]);
 				}
 			}
-			if (minV != SIZE_MAX) {
+			if (minV != -1) {
 				modelEdges.insert(ourEdge(u, minV));
 				newEdges.insert(ourEdge(u, minV));
 			}
-		}*/
+		}
 		return newEdges;
 	}
 
-	/**********************************************************************************************/ /**
-	 * @fn	void reconstruct(vector<ourEdge> initialEdges)
-	 *
-	 * @brief	Construct a Surface Reconstruction using the input Edges as a base.
-	 *
-	 * @param	initialEdges	The initial edges.
-	 **************************************************************************************************/
+	void pushCycles(int point, map<int, set<int>> &tempAdjList, vector<vector<int>> &allCycles, map<int, bool> &inCycle) {
+
+		stack<int> s;
+		vector<int> eu; // for the euler's circuit
+		int a = point;
+
+		while (!s.empty() || tempAdjList[a].size() != 0) {
+			if (tempAdjList[a].size()) {
+				s.push(a);
+				int t = *tempAdjList[a].begin();
+				tempAdjList[a].erase(t);
+				tempAdjList[t].erase(a);
+				a = t;
+			}
+			else {
+				eu.push_back(a);
+				a = s.top();
+				s.pop();
+			}
+		}
+
+		map<int, bool> visited;
+
+		for (int a : eu) {
+			if (!visited[a]) {
+				s.push(a);
+				visited[a] = true;
+			}
+			else {
+				vector<int> cycle;
+				cycle.push_back(a);
+				inCycle[a] = true;
+				while (s.top() != a) {
+					cycle.push_back(s.top());
+					inCycle[s.top()] = true;
+					s.pop();
+				}
+				allCycles.push_back(cycle);
+			}
+		}
+	}
+
+	vector<vector<int>> getAllCycles(map<int, set<int>> &tempAdjList, set<int> &leftPts) {
+		vector<vector<int>> allCycles;
+		map<int, bool> inCycle;
+		for (int point : leftPts) {
+			if (!inCycle[point]) {
+				pushCycles(point, tempAdjList, allCycles, inCycle);
+			}
+		}
+		return allCycles;
+	}
+
+	int processCycle(vector<int> &cycle) {
+		static int cycleNo = 1;
+		int facesAdded = 0;
+		// 1. get all triangles corresponding to the adjacent vertices in the cycle
+		// 2. store them in a priority queue with the score
+		// 3. get the best one, and insert the new triangles
+		cout << "Cycle Number " << cycleNo++ << std::endl;
+		cout << "Cycle Size :" << cycle.size() << std::endl;
+		for (int c : cycle) {
+			cout << c << ' ';
+		}
+		cout << "\nEnd of Cycle\n";
+
+		set<std::tuple<double, ourEdge, int>, std::greater<std::tuple<double, ourEdge, int>>> pq;
+		vector<set<std::tuple<double, ourEdge, int>, std::greater<std::tuple<double, ourEdge, int>>>::iterator> triangles(cycle.size());
+
+		cout << "Reached 0" << std::endl;
+
+		for (int i = 0; i < cycle.size(); i++) {
+			int j = (i + 1) % cycle.size();
+			int k = (i + 2) % cycle.size();
+			auto itr = pq.insert(make_tuple(getAngleScore(cycle[i], cycle[j], cycle[k]), ourEdge(i, k), j));
+			triangles[j] = itr.first;
+		}
+
+		cout << "Reached 1" << std::endl;
+
+		while (!pq.empty()) {
+			facesAdded++;
+			auto face = *pq.begin();
+			auto edge = get<1>(face);
+			int point = get<2>(face);
+			pq.erase(pq.begin());
+
+			if (isEdgeOverlap(edge))
+				continue;
+
+			cout << get<0>(face) << " " << ourEdge(cycle[edge[0]], cycle[edge[1]]) << " " << cycle[point] << "\n";
+
+			/*ourEdge e1(cycle[v1], cycle[v2]);
+			ourEdge e2(cycle[v1], cycle[v3]);
+			ourEdge e3(cycle[v3], cycle[v2]);
+			cout << "Reached " << 2 << std::endl;
+			cout << "Face:\n";
+			cout << ourFace(cycle[v1], cycle[v2], cycle[v3]) << '\n';
+			cout << "End of Face\n";
+			if (cycle[v1] == cycle[v2] || cycle[v2] == cycle[v3] || cycle[v1] == cycle[v3])
+				continue;
+			//if(!isEdgeOverlap(ourEdge(cycle[v1],cycle[v3]))) {
+			if (1) {
+				cout << "Reached " << 3 << std::endl;
+				modelFaces.insert(ourFace(cycle[v1], cycle[v2], cycle[v3]));
+				modelEdges.insert(e1);
+				modelEdges.insert(e2);
+				modelEdges.insert(e3);
+
+				int v0 = (v1 - 1) % cycle.size();
+				int v4 = (v3 + 1) % cycle.size();
+
+				if (v0 < 0)
+					v0 = v0 + cycle.size();
+
+				if (v4 < 0)
+					v4 = v4 + cycle.size();
+
+				cout << "Reached " << 3.2 << std::endl;
+
+				pq.erase(make_tuple(getTriScore(cycle[v0], cycle[v1], cycle[v2]), make_pair(v0, v2), v1));
+				cout << "Reached " << 3.3 << std::endl;
+				cout << "Point Index " << v2 << ' ' << v3 << ' ' << v4 << ".\nPoints Size = " << cycle.size() << std::endl;
+
+				cout << "points : " << cycle[v2] << ' ' << cycle[v3] << ' ' << cycle[v4] << std::endl;
+
+				pq.erase(make_tuple(getTriScore(cycle[v2], cycle[v3], cycle[v4]), make_pair(v2, v4), v3));
+
+				cout << "Reached " << 3.4 << std::endl;
+				auto newItem1 = make_tuple(getTriScore(cycle[v0], cycle[v1], cycle[v3]), make_pair(v0, v3), v1);
+				auto newItem2 = make_tuple(getTriScore(cycle[v1], cycle[v3], cycle[v4]), make_pair(v1, v4), v3);
+				cout << "Reached " << 4 << std::endl;
+
+				// if newItem1 is not in checkedFaces and newItem1 is not isEdgeOverlap
+				// insert in pq
+				// do same for newItem2
+
+				if (!isEdgeOverlap(ourEdge(cycle[v0], cycle[v3])) &&
+					checkedFaces.find(newItem1) == checkedFaces.end()) {
+					pq.insert(newItem1);
+				}
+
+				if (!isEdgeOverlap(ourEdge(cycle[v1], cycle[v4])) &&
+					checkedFaces.find(newItem2) == checkedFaces.end()) {
+					pq.insert(newItem2);
+				}
+				cout << "Reached " << 5 << std::endl;
+				checkedFaces.insert(newItem1);
+				checkedFaces.insert(newItem2);
+			}
+			cout << "Reached " << 6 << std::endl;
+			pq.erase(face);
+			cout << "Reached " << 7 << std::endl;*/
+		}
+		/*cout << "Done" << std::endl;
+		cout << "CheckedFaces\n";
+		for (auto elem : checkedFaces) {
+			int v1 = get<1>(elem).first;
+			int v3 = get<1>(elem).second;
+			int v2 = get<2>(elem);
+			cout << cycle[v1] << ' ' << cycle[v2] << ' ' << cycle[v3] << '\n';
+		}
+		cout << "End of Checked Faces\n";
+		return facesAdded;*/
+		return 0;
+	}
 
 	void reconstruct(vector<ourEdge> &initialEdges) {
 		vector<set<int>> currAdjList = getAdjList(pts.size(), initialEdges);
@@ -402,10 +445,6 @@ class SurfaceReconstruct {
 			maxEdge = std::max(maxEdge, CGAL::squared_distance(pts[e[0]], pts[e[1]]));
 
 		set<std::tuple<double, ourEdge, int>, std::greater<std::tuple<double, ourEdge, int>>> pq;
-
-		//std::priority_queue<std::tuple<double, ourEdge, int>> pq;
-
-		std::sort(initialEdges.begin(), initialEdges.end());
 
 		// cout<<"MST Edges"<<std::endl;
 		// for (auto &elem : initialEdges) {
@@ -446,7 +485,7 @@ class SurfaceReconstruct {
 				//~ }
 				ourEdge edge = get<1>(*pq.begin());
 				int point = get<2>(*pq.begin());
-				cout << get<0>(*pq.begin()) << " " << edge << " " << point << std::endl;
+				// cout << get<0>(*pq.begin()) << " " << edge << " " << point << std::endl;
 				pq.erase(pq.begin());
 				ourFace face(edge[0], edge[1], point);
 				if (edgeDegree[edge].size() == 2)
@@ -462,15 +501,16 @@ class SurfaceReconstruct {
 					//~ cout<<"Added"<<std::endl;
 					modelEdges.insert(newEdge1);
 					modelEdges.insert(newEdge2);
+					modelEdges.insert(edge);
 
 					edgeDegree[edge].push_back(point);
 					edgeDegree[newEdge1].push_back(edge[1]);
 					edgeDegree[newEdge2].push_back(edge[0]);
 
-					auto itr = modelFaces.insert(face);
-					vertFaces[edge[0]].push_back(itr.first);
-					vertFaces[edge[1]].push_back(itr.first);
-					vertFaces[point].push_back(itr.first);
+					modelFaces.insert(face);
+					vertAdjEdges[edge[0]].push_back(modelEdges.find(newEdge2));
+					vertAdjEdges[edge[1]].push_back(modelEdges.find(newEdge1));
+					vertAdjEdges[point].push_back(modelEdges.find(edge));
 
 					for (int i = 0; i < 3; i++) {
 						currAdjList[face[i]].insert(face[(i + 1) % 3]);
@@ -491,39 +531,55 @@ class SurfaceReconstruct {
 				}
 			}
 
-			cout << "FILE OUTPUT" << std::endl;
-			writeModel("output3.txt");
+			 cout << "FILE OUTPUT" << std::endl;
+			// writeModel("output3.txt");
 
 			edgeCondition--;
 
 			map<int, bool> leftVerts;
+			set<int> leftPts;
 			set<ourEdge> nextEdges;
-			vector<set<int>> tempAdjList(pts.size());
+			map<int, set<int>> tempAdjList;
+			vector<set<int>> temptempAdjList(pts.size());
 
 			for (auto &elem : modelEdges) {
 				if (edgeDegree[elem].size() == 1) {
 					leftVerts.insert({elem[0], false});
 					leftVerts.insert({elem[1], false});
+
+					leftPts.insert(elem[0]);
+					leftPts.insert(elem[1]);
+
 					tempAdjList[elem[0]].insert(elem[1]);
 					tempAdjList[elem[1]].insert(elem[0]);
-					// nextEdges.insert(elem);
+					temptempAdjList[elem[0]].insert(elem[1]);
+					temptempAdjList[elem[1]].insert(elem[0]);
 				}
 			}
 
-			for (auto &elem : leftVerts) {
-				if (!elem.second) {
-					auto hole = bfs(elem.first, leftVerts, tempAdjList);
-					auto Edges = processHole(hole, tempAdjList);
-					nextEdges.insert(Edges.begin(), Edges.end());
+			if (leftPts.size() == 0)
+				continue;
+
+			auto cycles = getAllCycles(tempAdjList, leftPts);
+
+			for (vector<int> &cycle : cycles) {
+				std::set<int> elem;
+				for (auto &v : cycle) {
+					elem.insert(v);
 				}
+				//auto Edges = processHole(elem, temptempAdjList);
+				processCycle(cycle);
+				//break;
+				//nextEdges.insert(Edges.begin(), Edges.end());
 			}
-			// modelEdges.clear();
+
+			modelEdges.clear();
 			for (auto &edge : nextEdges) {
 				for (auto &elem : getFacesFromEdge(edge, currAdjList, edgeCondition)) {
 					pq.insert(std::make_tuple(elem.second, edge, elem.first));
-					// cout<<"Finally added "<<edge<<" and "<<elem.first<<std::endl;
+					// 		// cout<<"Finally added "<<edge<<" and "<<elem.first<<std::endl;
 				}
-				// modelEdges.insert(edge);
+				modelEdges.insert(edge);
 			}
 		}
 		modelEdges.clear();
@@ -546,8 +602,6 @@ class SurfaceReconstruct {
 	SurfaceReconstruct(const char *inputFilePath) {
 
 		std::ifstream inputFile(inputFilePath);
-		logFile.open("log.txt");
-		logFile << std::boolalpha;
 
 		auto start = std::chrono::high_resolution_clock::now();
 		if (!CGAL::read_xyz_points(inputFile, back_inserter(pts))) { // output iterator over points
@@ -577,12 +631,7 @@ class SurfaceReconstruct {
 
 		valid = true;
 
-		ptsHandle.resize(pts.size());
-		vertFaces.resize(pts.size());
-
-		for (auto itr = dt.finite_vertices_begin(); itr != dt.finite_vertices_end(); itr++) {
-			ptsHandle[getIndex(pts, itr->point())] = itr;
-		}
+		vertAdjEdges.resize(pts.size());
 
 		for (auto faceItr = dt.finite_facets_begin(); faceItr != dt.finite_facets_end(); faceItr++) {
 			Triangle3D tri = dt.triangle(*faceItr);
@@ -593,10 +642,8 @@ class SurfaceReconstruct {
 
 		std::sort(dtFaces.begin(), dtFaces.end());
 
-		dtAdjList = getAdjList(pts.size(), get_All_Edges(dt, pts));
-
 		start = std::chrono::high_resolution_clock::now();
-		vector<ourEdge> initialEdges = getMstEdges(pts, dtAdjList);
+		vector<ourEdge> initialEdges = getMstEdges(pts, dt);
 		finish = std::chrono::high_resolution_clock::now();
 		cout << "MST created in " << std::chrono::duration<double>(finish - start).count() << " secs" << std::endl;
 
@@ -651,6 +698,8 @@ int main(int argc, char *argv[]) {
 	if (surface.isValid()) {
 		surface.writeModel(argv[2]);
 	}
+	else
+		return 1;
 
 	return 0;
 }

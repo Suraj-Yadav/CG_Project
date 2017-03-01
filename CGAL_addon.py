@@ -16,7 +16,7 @@ def showOnlyThis(objName: str):
 	if objName in bpy.data.objects:
 		for obj in bpy.data.objects:
 			obj.select = False
-			obj.hide = True
+			# obj.hide = True
 		bpy.data.objects[objName].hide = False
 		bpy.context.scene.objects.active = bpy.data.objects[objName]
 		bpy.data.objects[objName].select = True
@@ -55,6 +55,8 @@ def loadModelFromFile(outputFile: str, context):
 		obj.select = False
 
 	for obj in bpy.data.objects:
+		if obj.type == 'CAMERA':
+			continue
 		obj.select = True
 		bpy.ops.object.delete(use_global=False)
 
@@ -127,7 +129,14 @@ def loadModelFromFile(outputFile: str, context):
 		faceMesh.free()
 		obj = bpy.data.objects.new("Model_Face", me)
 		scene.objects.link(obj)
-		obj.data.show_edge_seams = True
+		obj.data.show_edge_seams = False
+		bpy.context.scene.objects.active = obj
+		print(obj)
+		bpy.ops.object.mode_set(mode='EDIT')
+		bpy.ops.mesh.select_all(action='SELECT')
+		bpy.ops.mesh.normals_make_consistent(inside=False)
+		bpy.ops.mesh.select_all(action='DESELECT')
+		bpy.ops.object.editmode_toggle()
 		print("Face Model Generated")
 
 	return {"FINISHED"}

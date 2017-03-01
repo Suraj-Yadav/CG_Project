@@ -1,6 +1,6 @@
 # Removing the extra Config types like RelWithDebInfo MinSizeRel.
 # Never used them anyway.
-set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE )
+# set(CMAKE_CONFIGURATION_TYPES Debug Release CACHE TYPE INTERNAL FORCE )
 
 # Name of the Project File. 
 # For Visual Studio it turns out to be the solution file name
@@ -21,6 +21,8 @@ include(${CGAL_USE_FILE})
 # find_package(OpenGL)
 
 # find_package(QGLViewer)
+
+message("NOTICE: ${CMAKE_CXX_FLAGS} not Found.")
 
 include_directories (BEFORE ../../include)
 
@@ -61,6 +63,24 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_target_properties( test3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 	#-----------------------------------
+	# test3DwithPost.cpp
+	#-----------------------------------
+		add_executable( test3DwithPost test3DwithPost.cpp util.h)
+		set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD 14)
+		set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(test3DwithPost ${CGAL_LIBRARIES})
+		set_target_properties( test3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# stest3DwithPost.cpp
+	#-----------------------------------
+		add_executable( stest3DwithPost stest3DwithPost.cpp util.h)
+		set_property(TARGET stest3DwithPost PROPERTY CXX_STANDARD 14)
+		set_property(TARGET stest3DwithPost PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(stest3DwithPost ${CGAL_LIBRARIES})
+		set_target_properties( stest3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
 	# surface3D.cpp
 	#-----------------------------------
 		add_executable( surface3D surface3D.cpp util.h)
@@ -77,6 +97,15 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_property(TARGET psurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(psurface3D ${CGAL_LIBRARIES})
 		set_target_properties( psurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# asurface3D.cpp
+	#-----------------------------------
+		add_executable( asurface3D asurface3D.cpp util.h)
+		set_property(TARGET asurface3D PROPERTY CXX_STANDARD 14)
+		set_property(TARGET asurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(asurface3D ${CGAL_LIBRARIES})
+		set_target_properties( asurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 	#-----------------------------------
 	# ssurface3D.cpp

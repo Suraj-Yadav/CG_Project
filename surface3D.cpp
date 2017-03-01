@@ -212,7 +212,7 @@ class SurfaceReconstruct {
 			Q.pop();
 			connected.insert(u);
 			for (auto &v : currAdjList[u]) {
-				cout<<u<<"->"<<v<<"\n";
+				cout << u << "->" << v << "\n";
 				if (verts.find(v) != verts.end() && !verts[v]) {
 					verts[v] = true;
 					Q.push(v);

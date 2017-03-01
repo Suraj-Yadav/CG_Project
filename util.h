@@ -7,7 +7,6 @@
 #include <chrono>
 #include <queue>
 
-
 // Uncovering some classes from std
 using std::vector;
 using std::string;
@@ -18,6 +17,8 @@ using std::cout;
 using std::map;
 using std::set;
 using std::stack;
+using std::make_tuple;
+using std::make_pair;
 
 #define val(x) #x "=", x
 
@@ -31,19 +32,19 @@ using std::stack;
 // 		os << '\n';                   \
 // 	}
 
-#define print(...) debug_print(std::cout, __VA_ARGS__)
-#define println(...)                         \
-	{                                        \
-		debug_print(std::cout, __VA_ARGS__); \
-		std::cout << '\n';                   \
+#define print(...) debug_print(__VA_ARGS__)
+#define println(...)              \
+	{                             \
+		debug_print(__VA_ARGS__); \
+		std::cout << '\n';        \
 	}
 
-void debug_print(std::ostream &os) {
+void debug_print() {
 }
 template <typename T, typename... Args>
-void debug_print(std::ostream &os, T t, Args... args) {
-	os << t << " ";
-	debug_print(os, args...);
+void debug_print(T t, Args... args) {
+	cout << t << " ";
+	debug_print(args...);
 }
 
 template <class T>
@@ -91,14 +92,19 @@ class ourEdge {
 		if (data[0] > data[1]) std::swap(data[0], data[1]);
 	}
 	int &operator[](int index) {
-		if (index < 0 || index > 1)
-			throw std::out_of_range("Index tried to access=" + index);
+		//if (index < 0 || index > 1)
+		//throw std::out_of_range("Index tried to access=" + index);
 		return data[index];
 	}
 	const int &operator[](int index) const {
-		if (index < 0 || index > 1)
-			throw std::out_of_range("Index tried to access=" + index);
+		//if (index < 0 || index > 1)
+		//throw std::out_of_range("Index tried to access=" + index);
 		return data[index];
+	}
+	int other(int u) {
+		if (u == data[0]) return data[1];
+		if (u == data[1]) return data[0];
+		return -1;
 	}
 };
 
@@ -110,6 +116,10 @@ bool operator<(const ourEdge &lhs, const ourEdge &rhs) {
 
 bool operator!=(const ourEdge &lhs, const ourEdge &rhs) {
 	return lhs[0] != rhs[0] || lhs[1] != rhs[1];
+}
+
+bool operator==(const ourEdge &lhs, const ourEdge &rhs) {
+	return lhs[0] == rhs[0] && lhs[1] == rhs[1];
 }
 
 std::ostream &operator<<(std::ostream &os, const ourEdge &e) {
@@ -126,13 +136,13 @@ class ourFace {
 		if (data[0] > data[1]) std::swap(data[0], data[1]);
 	}
 	int &operator[](int index) {
-		if (index < 0 || index > 2)
-			throw std::out_of_range("Index tried to access=" + index);
+		//if (index < 0 || index > 2)
+		//throw std::out_of_range("Index tried to access=" + index);
 		return data[index];
 	}
 	const int &operator[](int index) const {
-		if (index < 0 || index > 2)
-			throw std::out_of_range("Index tried to access=" + index);
+		//if (index < 0 || index > 2)
+		//throw std::out_of_range("Index tried to access=" + index);
 		return data[index];
 	}
 };

@@ -1,10 +1,13 @@
 \documentclass[preprint,5p,times,twocolumn]{elsarticle}
 \usepackage{algorithmic,amssymb,graphicx,amssymb,amsmath,psfig,epsfig,subfigure,multirow,url,arcs,proof}
+
+
 \usepackage[usenames, dvipsnames]{color}
-\usepackage[nodots]{numcompress}
+% \usepackage[nodots]{numcompress}
 \usepackage[linesnumbered,ruled]{algorithm2e}
 \usepackage{lineno}
 \usepackage{hyperref}
+
 \newtheorem{defn}{Definition}
 \newtheorem{theorem}{THEOREM}[section]
 \newtheorem{lemma}[theorem]{LEMMA}
@@ -20,10 +23,12 @@
 
 \setlength\linenumbersep{3pt}
 
-\journal{Computer \& Graphics}
+% \journal{Computer \& Graphics}
 
+\title{Surface Reconstruction}
+\author{Ashok Dhungana, Prabhav Adhikari, Suraj Yadav}
+\address{National Institute of Technology Calicut}
 \begin{document}
-
 \begin{frontmatter}
 
 %% Title, authors and addresses
@@ -47,17 +52,10 @@
 %% \address{Address\fnref{label3}}
 %% \fntext[label3]{}
 
-\title{Surface Reconstruction}
-
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{<author name>}
 %% \address[label1]{<address>}
 %% \address[label2]{<address>}
-
-\author{Ashok Dhungana, Prabhav Adhikari, Suraj Yadav}
-
-\address{National Institute of Technology Calicut}
-
 
 \begin{abstract}
 Given a finite sampling $S$ of an unknown surface $F$, Surface Reconstruction is concerned with the calculation of a model of $F$ from $S$. In this report we outline various existing algorithms for Surface Reconstruction and basics required for these algorithms. In general the basic idea, the algorithm and the complexities for each methods have been discussed. 
@@ -111,7 +109,7 @@ The medial axis together with the associated radius of the inscribed discs is ca
 		\includegraphics[height=1.8in,width=1.8in]{images/Gabriel_graph}
 	}
 	\caption{
-		\label{teaser_fig}(a) MAT (\textcolor{red}{Original Shape-Red}, \textcolor{green}{Tangent Circles-Green}, \textcolor{blue}{MAT-Blue}). (b) Gabriel Graph of Random Points.
+		(a) MAT (\textcolor{red}{Original Shape-Red}, \textcolor{green}{Tangent Circles-Green}, \textcolor{blue}{MAT-Blue}). (b) Gabriel Graph of Random Points.
 	}
 \end{figure}
 
@@ -157,17 +155,17 @@ The $\chi$-shape produced by the algorithm has the properties that:
 
 \begin{figure}[!h]
 	\centering
- 	\subfigure[\label{fig:chiShape}]{
+ 	\subfigure[\label{fig:chiShape1}]{
 		\includegraphics[height=1.5in,width=1.0in]{images/chi1}
  	}
- 	\subfigure[\label{fig:chiShape}]{
+ 	\subfigure[\label{fig:chiShape2}]{
 		\includegraphics[height=1.5in,width=1.0in]{images/chi2}
  	}
- 	\subfigure[\label{fig:chiShape}]{
+ 	\subfigure[\label{fig:chiShape3}]{
 		\includegraphics[height=1.5in,width=1.0in]{images/chi3}
  	}
 	\caption{
-		\label{teaser_fig}(a) Convex Hull of $P$. (b) Point Set $P$. (c) Characteristic $\chi$ shape of $P$.
+		(a) Convex Hull of $P$. (b) Point Set $P$. (c) Characteristic $\chi$ shape of $P$.
 	}
 \end{figure}
 
@@ -221,7 +219,7 @@ The algorithm can be summarized as comprising the following steps for an input p
 		\includegraphics[height=0.7in]{images/crust4}
 	}
 	\caption{
-		\label{teaser_fig}(a) The Voronoi diagram of S, with the net ball surrounding one pole shown. (b) The inner and outer polar balls. (c) The power diagram cells of the poles. (d) The power crust and the power shape.
+		(a) The Voronoi diagram of S, with the net ball surrounding one pole shown. (b) The inner and outer polar balls. (c) The power diagram cells of the poles. (d) The power crust and the power shape.
 	}
 \end{figure}
 \end{itemize}
@@ -259,20 +257,125 @@ The algorithm can be summarized as comprising the following steps for an input p
 \end{itemize}
 \begin{figure}[!h]
 	\centering
-	\subfigure[\label{fig:crust1}]{
+	\subfigure[\label{fig:shapehull1}]{
 		\includegraphics[height=1.5in]{images/shapehull1}
 	}
-	\subfigure[\label{fig:crust2}]{
+	\subfigure[\label{fig:shapehull2}]{
 		\includegraphics[height=1.5in]{images/shapehull2}
 	}
-	\subfigure[\label{fig:crust3}]{
+	\subfigure[\label{fig:shapehull3}]{
 		\includegraphics[height=1.5in]{images/shapehull3}
 	}
-	\subfigure[\label{fig:crust4}]{
+	\subfigure[\label{fig:shapehull4}]{
 		\includegraphics[height=1.5in]{images/shapehull4}
 	}
 	\caption{
-		\label{teaser_fig}(a) Sample Points. (b) Delaunay Triangulation. (c) Shape-hull graph. (d) Shape-hull.
+		(a) Sample Points. (b) Delaunay Triangulation. (c) Shape-hull graph. (d) Shape-hull.
+	}
+\end{figure}
+
+\section{Description of Algorithm}
+
+We start with Delaunay tetrahedralization of available points in $\mathbb{R}^3$. We use the 3D Delaunay to obtain graph $DT$, with edges as sides of tetrahedrals in Delaunay. Minimum spanning tree for $DT$ is obtained using Kruskal's  algorithm.  
+
+Score of a triangle is max of cosine of each angle in a triangle
+
+\begin{algorithm}
+\caption{updatePQ}
+\begin{algorithmic}
+\FORALL{$edge[u,v]\in edgesCovered$}
+\STATE $commonPoints \leftarrow$ \{adj verts of $u$\} $\cup$ \{adj verts of $v$\} $\setminus \{u,v\}$
+\FORALL{$points\in commonPoints$}
+\STATE $score \leftarrow getScore(edge, point)$
+\IF{$[u,v,point]\in DT$ $\wedge$ satisfies edge condition}
+\STATE $pq.insert(score,edge,point)$
+\ENDIF
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{validToAdd(face)}
+\begin{algorithmic}
+\FORALL{$edge\in face$}
+\IF{$deg(edge) = 2$}
+\RETURN $false$
+\ENDIF
+\IF{$deg(edge) = 1$ $\wedge$ angle between this face and another face with same edge $< 90$}
+\RETURN $false$
+\ENDIF
+\ENDFOR
+\RETURN $true$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{reconstruct(points3D,DT3,MSTdges)}
+\begin{algorithmic}
+\STATE $adjList \leftarrow getAdjList(MSTedges)$ 
+\STATE $edgeDegree$ $\leftarrow$ adj list of each edge
+\STATE $trianglesCovered$ $\leftarrow$ set of covered faces
+\STATE $edgesCovered \leftarrow MSTEdges$ 
+\STATE $pq \leftarrow createPQ(key=score\_of\_face,value=\{edge,opposite point\})$
+\STATE $edgeCondition \leftarrow 2$ 
+\STATE $updatePQ()$
+\WHILE{$edgeCondtition \geq 0$}
+\WHILE{$pq \neq \Phi$}
+\STATE $face \leftarrow pq.pop()$
+\IF{$deg(edge\in face) = 2$}
+\STATE $continue$
+\ENDIF
+\STATE $count \leftarrow$ count of edges in $face$ longer than maxlength in current graph
+\IF{$face\notin trianglesCovered$ $\wedge$ $validToAdd(face)$ $\wedge$ $count > edgeCondition$}
+\STATE add two new edges to $adjList$ and update $edgeDegree$
+\STATE add new face to $trianglesCovered$		
+\STATE update $pq$ by adding possible faces obtained by adding new edges
+\ENDIF
+\ENDWHILE
+\STATE $edgeCondition \leftarrow edgeCondition - 1$
+\STATE $holes\leftarrow$  subgraph of current surface with degree 1 edges 		
+\FORALL{$vertex\in holes$}
+\STATE $newEdges.add$(minimum length edge(in holes) from vertex that is a delaunay edge)
+\ENDFOR
+\STATE $updatePQ(newEdges)$
+\ENDWHILE
+\RETURN $trianglesCovered$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Current Output}
+\begin{figure}[!h]
+	\centering
+	\subfigure[\label{fig:buddha1}]{
+		\includegraphics[height=2.5in]{images/buddha1}
+	}
+\end{figure}
+\begin{figure}[!h]
+\centering
+	\subfigure[\label{fig:buddha2}]{
+		\includegraphics[height=2.5in]{images/buddha2}
+	}
+\end{figure}
+\begin{figure}[!h]
+\centering
+	\subfigure[\label{fig:sheep1}]{
+		\includegraphics[height=2.5in]{images/sheep1}
+	}
+\end{figure}
+\begin{figure}[!h]
+\centering
+	\subfigure[\label{fig:sheep2}]{
+		\includegraphics[height=2.5in]{images/sheep2}
+	}
+\end{figure}
+\begin{figure}[!h]
+\centering
+    \subfigure[\label{fig:dragon}]{
+		\includegraphics[height=2.5in]{images/dragon}
+	}
+	\caption{
+		(a),(b) Reconstructed Model with 757490 vertices and (c),(d) with 159312 vertices. (e) Rendered Image of a reconstructed surface with 100250 vertices.
 	}
 \end{figure}
 
