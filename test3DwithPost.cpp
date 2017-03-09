@@ -593,6 +593,7 @@ int main(int argc, char *argv[]) {
 	cout << std::boolalpha;
 
 	SurfaceReconstruct surface(argv[1]);
+
 	if (surface.isValid()) {
 		surface.writeModel(argv[2]);
 	}

@@ -12,6 +12,7 @@ typedef Kernel::Point_3 Point3D;
 typedef Kernel::Vector_3 Vector3D;
 typedef Kernel::Segment_3 Segment3D;
 typedef Kernel::Triangle_3 Triangle3D;
+
 typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
 typedef Kernel::Plane_3 Plane3D;
 const double inf = std::numeric_limits<double>::infinity();
@@ -250,7 +251,7 @@ class SurfaceReconstruct {
 		// }
 		for (auto &u : hole) {
 			int minV = -1;
-			
+
 			double dist = inf;
 			for (auto &v : hole) {
 				if (u >= v)

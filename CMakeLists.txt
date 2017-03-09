@@ -12,6 +12,8 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 OLD)
 endif()
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
 find_package(CGAL COMPONENTS Core)
 
 include(${CGAL_USE_FILE})
@@ -44,14 +46,14 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_target_properties( Intersection PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 		
-	#-----------------------------------
-	# test2D.cpp
-	#-----------------------------------
-		add_executable( test2D test2D.cpp util.h)
-		set_property(TARGET test2D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET test2D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(test2D ${CGAL_LIBRARIES})
-		set_target_properties( test2D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # test2D.cpp
+	# #-----------------------------------
+	# 	add_executable( test2D test2D.cpp util.h)
+	# 	set_property(TARGET test2D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET test2D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(test2D ${CGAL_LIBRARIES})
+	# 	set_target_properties( test2D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 	#-----------------------------------
 	# test3D.cpp
@@ -80,67 +82,67 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		target_link_libraries(stest3DwithPost ${CGAL_LIBRARIES})
 		set_target_properties( stest3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# surface3D.cpp
-	#-----------------------------------
-		add_executable( surface3D surface3D.cpp util.h)
-		set_property(TARGET surface3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET surface3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(surface3D ${CGAL_LIBRARIES})
-		set_target_properties( surface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # surface3D.cpp
+	# #-----------------------------------
+	# 	add_executable( surface3D surface3D.cpp util.h)
+	# 	set_property(TARGET surface3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET surface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(surface3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( surface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# psurface3D.cpp
-	#-----------------------------------
-		add_executable( psurface3D psurface3D.cpp util.h)
-		set_property(TARGET psurface3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET psurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(psurface3D ${CGAL_LIBRARIES})
-		set_target_properties( psurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # psurface3D.cpp
+	# #-----------------------------------
+	# 	add_executable( psurface3D psurface3D.cpp util.h)
+	# 	set_property(TARGET psurface3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET psurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(psurface3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( psurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# asurface3D.cpp
-	#-----------------------------------
-		add_executable( asurface3D asurface3D.cpp util.h)
-		set_property(TARGET asurface3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET asurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(asurface3D ${CGAL_LIBRARIES})
-		set_target_properties( asurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # asurface3D.cpp
+	# #-----------------------------------
+	# 	add_executable( asurface3D asurface3D.cpp util.h)
+	# 	set_property(TARGET asurface3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET asurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(asurface3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( asurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# ssurface3D.cpp
-	#-----------------------------------
-		add_executable( ssurface3D ssurface3D.cpp util.h)
-		set_property(TARGET ssurface3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET ssurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(ssurface3D ${CGAL_LIBRARIES})
-		set_target_properties( ssurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # ssurface3D.cpp
+	# #-----------------------------------
+	# 	add_executable( ssurface3D ssurface3D.cpp util.h)
+	# 	set_property(TARGET ssurface3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET ssurface3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(ssurface3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( ssurface3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# memTest3D.cpp
-	#-----------------------------------
-		add_executable( memTest3D memTest3D.cpp util.h)
-		set_property(TARGET memTest3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET memTest3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(memTest3D ${CGAL_LIBRARIES})
-		set_target_properties( memTest3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # memTest3D.cpp
+	# #-----------------------------------
+	# 	add_executable( memTest3D memTest3D.cpp util.h)
+	# 	set_property(TARGET memTest3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET memTest3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(memTest3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( memTest3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 	
-	#-----------------------------------
-	# assignment.cpp
-	#-----------------------------------
-		add_executable( assignment assignment.cpp util.h)
-		set_property(TARGET assignment PROPERTY CXX_STANDARD 14)
-		set_property(TARGET assignment PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(assignment ${CGAL_LIBRARIES})
-		set_target_properties( assignment PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-	#-----------------------------------
-	# boundary_curve.cpp
-	#-----------------------------------
-		add_executable( boundary_curve boundary_curve.cpp)
-		set_property(TARGET boundary_curve PROPERTY CXX_STANDARD 14)
-		set_property(TARGET boundary_curve PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(boundary_curve ${CGAL_LIBRARIES})
-		set_target_properties( boundary_curve PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # assignment.cpp
+	# #-----------------------------------
+	# 	add_executable( assignment assignment.cpp util.h)
+	# 	set_property(TARGET assignment PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET assignment PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(assignment ${CGAL_LIBRARIES})
+	# 	set_target_properties( assignment PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # boundary_curve.cpp
+	# #-----------------------------------
+	# 	add_executable( boundary_curve boundary_curve.cpp)
+	# 	set_property(TARGET boundary_curve PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET boundary_curve PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(boundary_curve ${CGAL_LIBRARIES})
+	# 	set_target_properties( boundary_curve PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 
 

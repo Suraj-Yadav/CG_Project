@@ -460,6 +460,7 @@ class SurfaceReconstruct {
 		cout << "Delaunay Triangulation created in " << std::chrono::duration<double>(finish - start).count() << " secs" << std::endl;
 
 		valid = true;
+		return;
 
 		vertAdjEdges.resize(pts.size());
 

@@ -1,4 +1,3 @@
-#!/bin/sh
 print_usage()
 {
 	echo Usage: "runAndBlend[.sh] EXECUTABLE INPUT_FILE [OUTPUTFILE]"

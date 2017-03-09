@@ -8,6 +8,7 @@ from bpy.types import Context
 import bmesh
 from typing import List
 from os import path
+from math import degrees
 
 addon_keymaps = []
 
@@ -25,15 +26,18 @@ def showOnlyThis(objName: str):
 
 
 def selectInMesh(obj, selectionType: str, indices: bytes):
-	if obj.mode == 'EDIT':
+	if obj.mode != 'EDIT':
 		bpy.ops.object.editmode_toggle()
+	
+	bpy.ops.mesh.select_all(action='DESELECT')
+	bpy.ops.object.editmode_toggle()
 
 	index = indices.decode().split()  # type: List[str]
 
 	elements = getattr(obj.data, selectionType)
 
-	for i in range(len(elements)):
-		elements[i].select = False
+	# for i in range(len(elements)):
+	# 	elements[i].select = False
 
 	for iStr in index:  # type: str
 		i = -1
@@ -61,11 +65,11 @@ def loadModelFromFile(outputFile: str, context):
 		bpy.ops.object.delete(use_global=False)
 
 	edgeMesh = bmesh.new()  # type: bmesh.BMesh
-	faceMesh = bmesh.new()  # type: bmesh.BMesh
 
 	vertices = []  # type: List[Tuple[float]]
 	edges = []  # type: List[Tuple[int]]
-	faces = []  # type: List[Tuple[int]]
+
+	modelName =path.basename(modelPath).replace('.ply','')
 
 	inputFile = open(outputFile)
 
@@ -271,7 +275,38 @@ class loadModel(Operator):
 # 		return {"FINISHED"}
 
 
+
+def findAngle(self, context):
+	me = context.edit_object.data
+	bm = bmesh.from_edit_mesh(me)
+
+	faces = [f for f in bm.faces if f.select]
+
+	if len(faces) != 2:
+		self.report({'ERROR'}, "Require two selected faces")
+		return
+
+	angle = faces[0].normal.angle(faces[1].normal)
+	self.report({'INFO'}, "Angle: %s°" % round(degrees(angle), 2))
+
+
+class FaceAngle(bpy.types.Operator):
+	"""Tooltip"""
+	bl_idname = "object.face_angle"
+	bl_label = "Face Angle"
+
+
+	@classmethod
+	def poll(cls, context):
+		return context.edit_object is not None
+
+
+	def execute(self, context):
+		findAngle(self, context)
+		return {'FINISHED'}
+
 def register():
+	bpy.utils.register_class(FaceAngle)
 	bpy.utils.register_class(vertexModel)
 	bpy.utils.register_class(edgeModel)
 	bpy.utils.register_class(faceModel)
@@ -301,6 +336,7 @@ def register():
 
 
 def unregister():
+	bpy.utils.unregister_class(FaceAngle)
 	bpy.utils.unregister_class(vertexModel)
 	bpy.utils.unregister_class(edgeModel)
 	bpy.utils.unregister_class(faceModel)

@@ -24,6 +24,8 @@ using std::make_pair;
 
 #define fprint(os, ...) ;
 #define fprintln(os, ...) ;
+// #define print(os, ...) ;
+// #define println(os, ...) ;
 
 // #define fprint(os, ...) debug_print(os, __VA_ARGS__)
 // #define fprintln(os, ...)             \
@@ -36,7 +38,7 @@ using std::make_pair;
 #define println(...)              \
 	{                             \
 		debug_print(__VA_ARGS__); \
-		std::cout << '\n';        \
+		std::cout << std::endl;   \
 	}
 
 void debug_print() {
@@ -55,6 +57,13 @@ int getIndex(const std::vector<T> &v, const T &elem) {
 	if (elem != *ptr)
 		throw std::runtime_error("World is coming to an end with no matching element");
 	return ptr - v.begin();
+}
+
+template <class T>
+void deleteFromVector(std::vector<T> &v, const T &elem) {
+	auto itr = std::find(v.begin(), v.end(), elem);
+	if (itr != v.end())
+		v.erase(itr);
 }
 
 template <class T>

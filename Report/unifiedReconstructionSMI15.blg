@@ -1,5 +1,48 @@
-This is BibTeX, Version 0.99dThe top-level auxiliary file: unifiedReconstructionSMI15.aux
+This is BibTeX, Version 0.99d (TeX Live 2016/W32TeX)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: unifiedReconstructionSMI15.aux
 The style file: elsarticle-num.bst
 Database file #1: references.bib
 Warning--empty journal in Avi-04
+You've used 12 entries,
+            2937 wiz_defined-function locations,
+            790 strings with 8425 characters,
+and the built_in function-call counts, 4368 in all, are:
+= -- 450
+> -- 123
+< -- 1
++ -- 49
+- -- 37
+* -- 408
+:= -- 609
+add.period$ -- 22
+call.type$ -- 12
+change.case$ -- 12
+chr.to.int$ -- 0
+cite$ -- 13
+duplicate$ -- 123
+empty$ -- 461
+format.name$ -- 47
+if$ -- 1092
+int.to.chr$ -- 0
+int.to.str$ -- 12
+missing$ -- 12
+newline$ -- 63
+num.names$ -- 12
+pop$ -- 66
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 221
+stack$ -- 0
+substring$ -- 294
+swap$ -- 48
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 1
+while$ -- 32
+width$ -- 14
+write$ -- 132
 (There was 1 warning)
