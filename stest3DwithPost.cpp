@@ -22,7 +22,7 @@ typedef CGAL::Surface_mesh<Point3D> Mesh;
 typedef boost::graph_traits<Mesh>::face_descriptor face_descriptor;
 typedef boost::graph_traits<Mesh>::vertex_descriptor vertex_descriptor;
 
-const double inf = std::numeric_limits<double>::infinity();
+const Kernel::FT inf = std::numeric_limits<Kernel::FT>::infinity();
 
 vector<set<int>> getAdjList(int pointsCount, const vector<ourEdge> &edges) {
 	vector<set<int>> adjList(pointsCount);
@@ -65,12 +65,25 @@ class progress_bar {
 		finished = true;
 		if (t.joinable())
 			t.join();
+		int barWidth = 70;
+		cerr << "[";
+		int pos = barWidth;
+		for (int i = 0; i < barWidth; ++i) {
+			if (i < pos)
+				cerr << "=";
+			else if (i == pos)
+				cerr << ">";
+			else
+				cerr << " ";
+		}
+		cerr << "] " << int(100.0) << " %\r";
+		cerr.flush();
 	}
 };
 
 class SurfaceReconstruct {
 	vector<Point3D> pts;
-	vector<double> maxLength;
+	vector<Kernel::FT> maxLength;
 	DT3 dt;
 	bool valid;
 	set<ourFace> possibleFaces;
@@ -78,8 +91,8 @@ class SurfaceReconstruct {
 	set<ourEdge> modelEdges;
 	set<ourFace> modelFaces;
 	map<ourEdge, vector<int>> edgeDegree;
-	double maxEdge;
-	double maxMinRatio;
+	Kernel::FT maxEdge;
+	Kernel::FT maxMinRatio;
 	vector<vector<set<ourEdge>::iterator>> vertAdjEdges;
 
 	vector<ourEdge> getMstEdges() {
@@ -89,7 +102,7 @@ class SurfaceReconstruct {
 		for (int i = 0; i < pts.size(); i++)
 			handle.push_back(uf.make_set(i));
 
-		vector<std::pair<double, ourEdge>> allEdges;
+		vector<std::pair<Kernel::FT, ourEdge>> allEdges;
 
 		for (auto &edge : possibleEdges) {
 			allEdges.push_back({sqDist(pts[edge[0]], pts[edge[1]]), edge});
@@ -118,13 +131,13 @@ class SurfaceReconstruct {
 		return possibleFaces.find(face) != possibleFaces.end();
 	}
 
-	double getTriScore(int u, int v, int w) {
+	Kernel::FT getTriScore(int u, int v, int w) {
 		Point3D a = pts[u], b = pts[v], c = pts[w];
 		Vector3D AB(a, b), AC(a, c), BC(b, c);
 		AB = AB / std::sqrt(AB.squared_length());
 		AC = AC / std::sqrt(AC.squared_length());
 		BC = BC / std::sqrt(BC.squared_length());
-		double score = AB * AC;
+		Kernel::FT score = AB * AC;
 		score = std::min(AC * BC, score);
 		score = std::min(-AB * BC, score);
 		return score;
@@ -179,12 +192,12 @@ class SurfaceReconstruct {
 		modelEdges.erase(ourEdge(edge[1], remove));
 	}
 
-	int testEdges(Point3D a, Point3D b, Point3D c, double length) {
+	int testEdges(Point3D a, Point3D b, Point3D c, Kernel::FT length) {
 		int ans = 0;
-		double maxiLength =
-				   std::max(std::max(sqDist(a, b), sqDist(b, c)), sqDist(a, c)),
-			   miniLength =
-				   std::min(std::min(sqDist(a, b), sqDist(b, c)), sqDist(a, c));
+		Kernel::FT maxiLength =
+					   std::max(std::max(sqDist(a, b), sqDist(b, c)), sqDist(a, c)),
+				   miniLength =
+					   std::min(std::min(sqDist(a, b), sqDist(b, c)), sqDist(a, c));
 		if (sqDist(a, b) <= length)
 			ans++;
 		if (sqDist(a, c) <= length)
@@ -200,10 +213,10 @@ class SurfaceReconstruct {
 		return ans;
 	}
 
-	vector<pair<int, double>>
+	vector<pair<int, Kernel::FT>>
 	getFacesFromEdge(const ourEdge &edge, const vector<set<int>> &currAdjList,
 					 int edgeCondition) {
-		vector<pair<int, double>> elems;
+		vector<pair<int, Kernel::FT>> elems;
 		set<int> t, f;
 		// cout << edge << "\n";
 		for (auto &point : currAdjList[edge[0]]) {
@@ -301,7 +314,7 @@ class SurfaceReconstruct {
 		if (edgeDeg.size() == 2) {
 			println(edge[0], edge[1], edgeDeg[0], edgeDeg[1], newPoint);
 
-			double a1, a2, a3;
+			Kernel::FT a1, a2, a3;
 
 			Vector3D norm1 =
 						 CGAL::normal(pts[edge[0]], pts[edge[1]], pts[edgeDeg[0]]),
@@ -357,30 +370,30 @@ class SurfaceReconstruct {
 			return newEdges;
 		}
 
-		if (leftVerts.size() == 4) {
-			int p[4], i = 0;
-			for (auto &elem : leftVerts) {
-				p[i++] = elem;
-			}
+		// if (leftVerts.size() == 4) {
+		// 	int p[4], i = 0;
+		// 	for (auto &elem : leftVerts) {
+		// 		p[i++] = elem;
+		// 	}
 
-			if (modelEdges.find({p[0], p[1]}) == modelEdges.end()) {
-				addFaceToModel({p[0], p[1], p[2]});
-				addFaceToModel({p[0], p[1], p[3]});
-			}
-			else if (modelEdges.find({p[0], p[2]}) == modelEdges.end()) {
-				addFaceToModel({p[0], p[1], p[2]});
-				addFaceToModel({p[0], p[2], p[3]});
-			}
-			else {
-				addFaceToModel({p[0], p[1], p[3]});
-				addFaceToModel({p[0], p[2], p[3]});
-			}
-			return newEdges;
-		}
+		// 	if (modelEdges.find({p[0], p[1]}) == modelEdges.end()) {
+		// 		addFaceToModel({p[0], p[1], p[2]});
+		// 		addFaceToModel({p[0], p[1], p[3]});
+		// 	}
+		// 	else if (modelEdges.find({p[0], p[2]}) == modelEdges.end()) {
+		// 		addFaceToModel({p[0], p[1], p[2]});
+		// 		addFaceToModel({p[0], p[2], p[3]});
+		// 	}
+		// 	else {
+		// 		addFaceToModel({p[0], p[1], p[3]});
+		// 		addFaceToModel({p[0], p[2], p[3]});
+		// 	}
+		// 	return newEdges;
+		// }
 
-		vector<std::pair<double, ourEdge>> allEdges;
+		vector<std::pair<Kernel::FT, ourEdge>> allEdges;
 		vector<bool> covered(pts.size(), false);
-		//         double avgCount = 0, avgSum = 0, lastAvg = 0, lastEdge = 0;
+		//         Kernel::FT avgCount = 0, avgSum = 0, lastAvg = 0, lastEdge = 0;
 
 		println("Lengths");
 		for (auto &edge : possibleEdges) {
@@ -461,9 +474,13 @@ avgCount++;
 		for (auto &e : initialEdges)
 			maxEdge = std::max(maxEdge, sqDist(pts[e[0]], pts[e[1]]));
 
-		set<std::tuple<double, ourEdge, int>,
-			std::greater<std::tuple<double, ourEdge, int>>>
-			pq;
+		maxEdge *= Kernel::FT(1.0001);
+
+		cerr << CGAL::sqrt(maxEdge) << "\n";
+
+		set<std::tuple<Kernel::FT, ourEdge, int>,
+			std::greater<std::tuple<Kernel::FT, ourEdge, int>>>
+			pq, nextPQ;
 		modelEdges.insert(initialEdges.begin(), initialEdges.end());
 		int edgeCondition = 2;
 		// for (auto &elem : pq) {
@@ -525,8 +542,10 @@ avgCount++;
 				ourEdge edge = get<1>(*pq.begin());
 				int point = get<2>(*pq.begin());
 				cout << get<0>(*pq.begin()) << " " << edge << " " << point << std::endl;
-				pq.erase(pq.begin());
 				ourFace face(edge[0], edge[1], point);
+
+				pq.erase(pq.begin());
+
 				if (modelFaces.find(face) != modelFaces.end())
 					continue;
 				if (edgeDegree[edge].size() == 2) {
@@ -568,8 +587,12 @@ avgCount++;
 					validToAdd(newEdge1, edge[1], remove1) &&
 					validToAdd(newEdge2, edge[0], remove2) &&
 					(remove1 != -1 || !isEdgeOverlap(newEdge1)) &&
-					(remove2 != -1 || !isEdgeOverlap(newEdge2)) &&
-					testEdges(pts[face[0]], pts[face[1]], pts[face[2]], maxEdge) >= edgeCondition) {
+					(remove2 != -1 || !isEdgeOverlap(newEdge2))) {
+					
+					if (testEdges(pts[face[0]], pts[face[1]], pts[face[2]], maxEdge) < edgeCondition) {
+						nextPQ.insert(*pq.begin());
+						continue;
+					}
 
 					if (remove != -1) {
 						removeFace(edge, remove);
@@ -598,14 +621,17 @@ avgCount++;
 						if (u == edge[0] && v == edge[1])
 							continue;
 						for (auto &elem : getFacesFromEdge(ourEdge(u, v), currAdjList, 0)) {
-							pq.insert(
-								std::make_tuple(elem.second, ourEdge(u, v), elem.first));
+							pq.insert(std::make_tuple(elem.second, ourEdge(u, v), elem.first));
 							// cout << edge << " added " << ourEdge(u, v) << " and " <<
 							// elem.first << "\n";
 						}
 					}
 				}
+				
 			}
+
+			nextPQ.swap(pq);
+
 			bar.terminate();
 
 			if (lastFaces == modelFaces.size())
@@ -726,7 +752,7 @@ avgCount++;
 
 			nextEdges.swap(modelEdges);
 
-			writeModel("tempMod.txt" + std::to_string(2 - edgeCondition));
+			writeModel("tempMod" + std::to_string(2 - edgeCondition) + ".off");
 
 			nextEdges.swap(modelEdges);
 			// modelEdges.clear();
@@ -840,20 +866,20 @@ avgCount++;
 				addFaceToModel({cycle[0], cycle[1], cycle[2]});
 			}
 
-			if (cycle.size() == 4) {
-				if (modelEdges.find({cycle[0], cycle[1]}) == modelEdges.end()) {
-					addFaceToModel({cycle[0], cycle[1], cycle[2]});
-					addFaceToModel({cycle[0], cycle[1], cycle[3]});
-				}
-				else if (modelEdges.find({cycle[0], cycle[2]}) == modelEdges.end()) {
-					addFaceToModel({cycle[0], cycle[1], cycle[2]});
-					addFaceToModel({cycle[0], cycle[2], cycle[3]});
-				}
-				else {
-					addFaceToModel({cycle[0], cycle[1], cycle[3]});
-					addFaceToModel({cycle[0], cycle[2], cycle[3]});
-				}
-			}
+			// if (cycle.size() == 4) {
+			// 	if (modelEdges.find({cycle[0], cycle[1]}) == modelEdges.end()) {
+			// 		addFaceToModel({cycle[0], cycle[1], cycle[2]});
+			// 		addFaceToModel({cycle[0], cycle[1], cycle[3]});
+			// 	}
+			// 	else if (modelEdges.find({cycle[0], cycle[2]}) == modelEdges.end()) {
+			// 		addFaceToModel({cycle[0], cycle[1], cycle[2]});
+			// 		addFaceToModel({cycle[0], cycle[2], cycle[3]});
+			// 	}
+			// 	else {
+			// 		addFaceToModel({cycle[0], cycle[1], cycle[3]});
+			// 		addFaceToModel({cycle[0], cycle[2], cycle[3]});
+			// 	}
+			// }
 		}
 	}
 
@@ -867,6 +893,11 @@ avgCount++;
 			cerr << "Error: cannot read file.";
 			return;
 		}
+
+		// for (auto &elem : pts) {
+		// 	elem = Point3D(100.0 * elem.x(), 100.0 * elem.y(), 100.0 * elem.z());
+		// }
+
 		sortAndRemoveDuplicate(pts);
 		pts.shrink_to_fit();
 
@@ -874,7 +905,7 @@ avgCount++;
 
 		auto finish = std::chrono::high_resolution_clock::now();
 		cout << pts.size() << " points read in "
-			 << std::chrono::duration<double>(finish - start).count() << " secs"
+			 << std::chrono::duration<Kernel::FT>(finish - start).count() << " secs"
 			 << std::endl;
 
 		start = std::chrono::high_resolution_clock::now();
@@ -892,7 +923,7 @@ avgCount++;
 		}
 		finish = std::chrono::high_resolution_clock::now();
 		cout << "Delaunay Triangulation created in "
-			 << std::chrono::duration<double>(finish - start).count() << " secs"
+			 << std::chrono::duration<Kernel::FT>(finish - start).count() << " secs"
 			 << std::endl;
 
 		valid = true;
@@ -921,7 +952,7 @@ avgCount++;
 		vector<ourEdge> initialEdges = getMstEdges();
 		finish = std::chrono::high_resolution_clock::now();
 		cout << "MST created in "
-			 << std::chrono::duration<double>(finish - start).count() << " secs"
+			 << std::chrono::duration<Kernel::FT>(finish - start).count() << " secs"
 			 << std::endl;
 
 		for (auto &edge : initialEdges) {
@@ -938,31 +969,35 @@ avgCount++;
 		postProcess();
 
 		modelEdges.clear();
-		modelEdges.insert(initialEdges.begin(), initialEdges.end());
+		// modelEdges.insert(initialEdges.begin(), initialEdges.end());
 
 		finish = std::chrono::high_resolution_clock::now();
 		cout << std::endl
 			 << pts.size() << " Reconstructed in "
-			 << std::chrono::duration<double>(finish - start).count() << std::endl;
+			 << std::chrono::duration<Kernel::FT>(finish - start).count() << std::endl;
+
+		std::ofstream outputFile("MST.txt");
+		outputFile << pts.size() << "\n";
+		for (Point3D &point : pts) {
+			outputFile << point << "\n";
+		}
+		outputFile << initialEdges.size() << "\n";
+		for (auto &edge : initialEdges) {
+			outputFile << edge[0] << " " << edge[1] << "\n";
+		}
 	}
 
 	bool isValid() { return valid; }
 
 	void writeModel(std::string outputFilePath) {
 		std::ofstream outputFile(outputFilePath);
-		outputFile << pts.size() << std::endl;
-		for (Point3D point : pts) {
-			outputFile << point << std::endl;
+		outputFile << "OFF\n";
+		outputFile << pts.size() << " " << modelFaces.size() << " 0\n";
+		for (Point3D &point : pts) {
+			outputFile << point << "\n";
 		}
-
-		outputFile << modelEdges.size() << std::endl;
-		for (auto edge : modelEdges) {
-			outputFile << edge[0] << " " << edge[1] << std::endl;
-		}
-
-		outputFile << modelFaces.size() << std::endl;
 		for (auto &tri : modelFaces) {
-			outputFile << tri[0] << " " << tri[1] << " " << tri[2] << std::endl;
+			outputFile << "3 " << tri[0] << " " << tri[1] << " " << tri[2] << "\n";
 		}
 	}
 };

@@ -64,14 +64,17 @@ def loadModelFromFile(outputFile: str, context):
 		obj.select = True
 		bpy.ops.object.delete(use_global=False)
 
+	for i in bpy.data.meshes:
+		bpy.data.meshes.remove(i, do_unlink=True)
+
+	directory = path.dirname(outputFile)
+
 	edgeMesh = bmesh.new()  # type: bmesh.BMesh
 
 	vertices = []  # type: List[Tuple[float]]
 	edges = []  # type: List[Tuple[int]]
 
-	modelName =path.basename(modelPath).replace('.ply','')
-
-	inputFile = open(outputFile)
+	inputFile = open(path.join(directory,"MST.txt"))
 
 	verticesCount = int(inputFile.readline())  # type: int
 	for i in range(verticesCount):
@@ -81,9 +84,7 @@ def loadModelFromFile(outputFile: str, context):
 	for i in range(edgesCount):
 		edges.append(list(map(int, inputFile.readline().split())))
 
-	facesCount = int(inputFile.readline())  # type: int
-	for i in range(facesCount):
-		faces.append(list(map(int, inputFile.readline().split())))
+	inputFile.close()
 
 	if verticesCount > 0:
 		me = bpy.data.meshes.new("Vertex_Mesh")
@@ -93,7 +94,6 @@ def loadModelFromFile(outputFile: str, context):
 		vertexMesh.free()
 		obj = bpy.data.objects.new("Model_Vertex", me)
 		scene.objects.link(obj)
-		obj.data.show_edge_seams = True
 		print("Vertex Model Generated")
 
 	if edgesCount > 0:
@@ -107,41 +107,46 @@ def loadModelFromFile(outputFile: str, context):
 		edgeMesh.free()
 		obj = bpy.data.objects.new("Model_Edge", me)
 		scene.objects.link(obj)
-		obj.data.show_edge_seams = True
 		# obj.show_x_ray = True
 		print("Edge Model Generated")
 
-	if facesCount > 0:
-		me = bpy.data.meshes.new("Face_Mesh")
-		faceMesh = bmesh.new()  # type: bmesh.BMesh
-		vertexHandle = [faceMesh.verts.new(i) for i in vertices]
-		for face in faces:
-			faceMesh.faces.new((vertexHandle[face[0]], vertexHandle[face[1]], vertexHandle[face[2]]))
-		# for face in faces:
-		# 	a = faceMesh.verts.new(vertices[face[0]])
-		# 	b = faceMesh.verts.new(vertices[face[1]])
-		# 	c = faceMesh.verts.new(vertices[face[2]])
-		# 	faceMesh.faces.new((a, b, c))
+	models = []
+	i=1
+	while True:
+		fileName = path.join(directory,"tempMod"+str(i)+'.off')
+		if path.isfile(fileName):
+			print(i, fileName)
+			models.append(path.basename(fileName).replace('.off',''))
+			bpy.ops.import_mesh.off(filepath=fileName)
+			i+=1
+		else:
+			break
+	
+	print(i, outputFile)
+	models.append(path.basename(outputFile).replace('.off',''))
+	bpy.ops.import_mesh.off(filepath=outputFile)
 
-		for edge in edges:
-			meshEdge = faceMesh.edges.get((vertexHandle[edge[0]], vertexHandle[edge[1]]))
-			if meshEdge is None:
-				meshEdge = faceMesh.edges.new((vertexHandle[edge[0]], vertexHandle[edge[1]]))
-			meshEdge.seam = True
-
-		faceMesh.to_mesh(me)
-		faceMesh.free()
-		obj = bpy.data.objects.new("Model_Face", me)
-		scene.objects.link(obj)
-		obj.data.show_edge_seams = False
-		bpy.context.scene.objects.active = obj
-		print(obj)
-		bpy.ops.object.mode_set(mode='EDIT')
+	for obj in bpy.data.objects:
+		if obj.type == 'CAMERA':
+			continue
+		obj.select = True
+		scene.objects.active = obj
+		print(obj, obj.mode)
+		bpy.ops.object.editmode_toggle()
 		bpy.ops.mesh.select_all(action='SELECT')
 		bpy.ops.mesh.normals_make_consistent(inside=False)
 		bpy.ops.mesh.select_all(action='DESELECT')
 		bpy.ops.object.editmode_toggle()
-		print("Face Model Generated")
+
+
+	for j in range(1,i+1):
+		for k in range(1,i+1):
+			print(j,k,models[k-1])
+			if k==j:
+				bpy.data.objects[models[k-1]].hide=False
+			else:
+				bpy.data.objects[models[k-1]].hide=True
+			bpy.data.objects[models[k-1]].keyframe_insert(data_path="hide", index=-1, frame=j)
 
 	return {"FINISHED"}
 
@@ -398,6 +403,12 @@ class cgalPanel(Panel):
 		row = layout.row()
 		row.prop(context.scene, 'facesToSelect')
 		row.operator("cgal.select_given_faces", icon="FACESEL")
+
+		row = layout.row()
+		row.operator("object.face_angle")
+
+		row = layout.row()
+		row.operator("mesh.select_non_manifold")
 
 
 if __name__ == "__main__":

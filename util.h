@@ -132,7 +132,7 @@ bool operator==(const ourEdge &lhs, const ourEdge &rhs) {
 }
 
 std::ostream &operator<<(std::ostream &os, const ourEdge &e) {
-	return os << "(" << e[0] << " " << e[1] << ")";
+	return os << "( " << e[0] << " " << e[1] << " )";
 }
 
 class ourFace {
@@ -167,7 +167,7 @@ bool operator!=(const ourFace &lhs, const ourFace &rhs) {
 }
 
 std::ostream &operator<<(std::ostream &os, const ourFace &f) {
-	return os << "(" << f[0] << " " << f[1] << " " << f[2] << ")";
+	return os << "( " << f[0] << " " << f[1] << " " << f[2] << " )";
 }
 
 #endif // UTIL_H

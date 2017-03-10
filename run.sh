@@ -8,7 +8,7 @@ mag=$'\e[1;35m'
 cyn=$'\e[1;36m'
 end=$'\e[0m'
 
-rm tempMod.txt*
+rm tempMod*
 
 # if [ 1 -eq $# ]
 
@@ -62,9 +62,9 @@ printf "${mag}./$1 $fileName output_"$(basename $1 .exe)".txt > log_"$(basename 
 echo
 if [[ "$OSTYPE" == "msys" ]]
 then
-	./$1 $fileName output_"$(basename $1 .exe)".txt > log_"$(basename $1 .exe)".txt
+	./$1 $fileName output_"$(basename $1 .exe)".off > log_"$(basename $1 .exe)".txt
 	tail -n1 log_"$(basename $1 .exe)".txt
 else
-	./$1 $fileName output_$1.txt > log_$1.txt
+	./$1 $fileName output_$1.off > log_$1.txt
 	tail -n1 log_$1.txt
 fi
