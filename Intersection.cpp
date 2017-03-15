@@ -1,26 +1,36 @@
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Delaunay_triangulation_3.h>
-#include <CGAL/intersections.h>
-#include <CGAL/IO/read_xyz_points.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+// #include <CGAL/Delaunay_triangulation_3.h>
+// #include <CGAL/intersections.h>
+// #include <CGAL/IO/read_xyz_points.h>
 
 #include <bits/stdc++.h>
 
 //CGAL::Exact_predicates_exact_constructions_kernel
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel Kernel;
+typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
 typedef Kernel::Point_3 Point3D;
-typedef Kernel::Line_3 Line3D;
-typedef Kernel::Segment_3 Segment3D;
-typedef Kernel::Intersect_3 Intersect3D;
-typedef Kernel::Triangle_3 Triangle3D;
-typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
+typedef Kernel::Vector_3 Vector3D;
+typedef Kernel::Direction_3 Direction3D;
 
 using std::cerr;
 using std::cout;
 using std::endl;
 
 int main(int argc, char *argv[]) {
-	// Point3D p[2];
+	Point3D p[4];
+	p[0] = Point3D(0, 0, 0);
+	p[0] = Point3D(2, 0, 0);
+	p[0] = Point3D(0, 0, 0);
+	p[0] = Point3D(0, 2, 0);
+
+	Vector3D a1(p[0], p[1]), b1(p[2], p[3]);
+	Direction3D a2(a1), b2(b1);
+	cout << std::boolalpha;
+	cout << a1 * b1 << "\n";
+	cout << ((a1 * b1) < 0) << "\n";
+	cout << ((a1 * b1) == 0) << "\n";
+	cout << ((a1 * b1) > 0) << "\n";
+	// cout << a2 * b2 << "\n";
 	// Triangle3D tri1({-0.28358, -10.0897, -0.86783}, {-0.42034, -10.0688, -0.43415}, {0.34223, -9.9244, -0.3875});
 	// Segment3D line({-0.28358, -10.0897, -0.86783}, {0.89782, -10.0743, 0.26342});
 	// std::cin >> p[0] >> p[1];
@@ -47,35 +57,35 @@ int main(int argc, char *argv[]) {
 	// std::cout << "Nope\n";
 	// }
 
-	std::ifstream inputFile(argv[1]);
+	// std::ifstream inputFile(argv[1]);
 
-	DT3 m_dt;
+	// DT3 m_dt;
 
-	std::list<Point3D> pts;
-	if (!CGAL::read_xyz_points(inputFile,			  // input ifstream
-							   back_inserter(pts))) { // output iterator over points
-		// showError(QObject::tr("Error: cannot read file %1.").arg(filename));
-		cerr << "Error: cannot read file.";
-	}
-	cout << argv[1] << "\n";
-	cout << "Read " << pts.size() << " points ";
-	/* Insert the points to build a Delaunay triangulation */
-	/* Note: this function returns the number of inserted points;
-      it is not guaranteed to insert the points following the order of iteraror. */
-	m_dt.insert(pts.begin(), pts.end());
-	cout << "Inserted ";
-	/* Check the combinatorial validity of the triangulation */
-	/* Note: when it is set to be true,
-      messages describing the first invalidity encountered are printed. */
-	if (!m_dt.is_valid()) { // default: false - verbosity off
-		cout << "Error: fail to build a Delaunay triangulation." << std::endl;
-		return -1;
-	}
-	/* Check the dimension */
-	if (m_dt.dimension() != 3) {
-		cout << "Error: cannot built a 3D triangulation.\n Current dimension = " << m_dt.dimension() << std::endl;
-		return -1;
-	}
-	cout << "Good\n";
+	// std::list<Point3D> pts;
+	// if (!CGAL::read_xyz_points(inputFile,			  // input ifstream
+	// 						   back_inserter(pts))) { // output iterator over points
+	// 	// showError(QObject::tr("Error: cannot read file %1.").arg(filename));
+	// 	cerr << "Error: cannot read file.";
+	// }
+	// cout << argv[1] << "\n";
+	// cout << "Read " << pts.size() << " points ";
+	// /* Insert the points to build a Delaunay triangulation */
+	// /* Note: this function returns the number of inserted points;
+	//   it is not guaranteed to insert the points following the order of iteraror. */
+	// m_dt.insert(pts.begin(), pts.end());
+	// cout << "Inserted ";
+	// /* Check the combinatorial validity of the triangulation */
+	// /* Note: when it is set to be true,
+	//   messages describing the first invalidity encountered are printed. */
+	// if (!m_dt.is_valid()) { // default: false - verbosity off
+	// 	cout << "Error: fail to build a Delaunay triangulation." << std::endl;
+	// 	return -1;
+	// }
+	// /* Check the dimension */
+	// if (m_dt.dimension() != 3) {
+	// 	cout << "Error: cannot built a 3D triangulation.\n Current dimension = " << m_dt.dimension() << std::endl;
+	// 	return -1;
+	// }
+	// cout << "Good\n";
 	return 0;
 }

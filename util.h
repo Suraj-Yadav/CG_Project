@@ -1,11 +1,15 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <bits/stdc++.h>
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <queue>
+#ifdef __linux__
+	#include <bits/stdc++.h>
+#elif _WIN32
+	#include <fstream>
+	#include <atomic>
+	#include <thread>
+	#include <queue>
+#endif
+
 
 // Uncovering some classes from std
 using std::vector;

@@ -12,8 +12,6 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 OLD)
 endif()
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
 find_package(CGAL COMPONENTS Core)
 
 include(${CGAL_USE_FILE})

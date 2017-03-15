@@ -8,7 +8,8 @@ mag=$'\e[1;35m'
 cyn=$'\e[1;36m'
 end=$'\e[0m'
 
-rm tempMod*
+rm MST.txt
+rm *.off
 
 # if [ 1 -eq $# ]
 

@@ -292,7 +292,7 @@ def findAngle(self, context):
 		return
 
 	angle = faces[0].normal.angle(faces[1].normal)
-	self.report({'INFO'}, "Angle: %s°" % round(degrees(angle), 2))
+	self.report({'INFO'}, "Angle: %s°" % degrees(angle))
 
 
 class FaceAngle(bpy.types.Operator):
