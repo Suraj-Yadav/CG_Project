@@ -1,7 +1,7 @@
 cd /D C:\ExtLibs\CGAL-4.9
 
 cd /D G:\work\CG_Project\build
-"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 MSBuild /p:Configuration=Release test3D.vcxproj
 
 cmake -G "Visual Studio 14 2015 Win64" ..

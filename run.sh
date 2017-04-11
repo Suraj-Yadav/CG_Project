@@ -63,9 +63,21 @@ printf "${mag}./$1 $fileName output_"$(basename $1 .exe)".txt > log_"$(basename 
 echo
 if [[ "$OSTYPE" == "msys" ]]
 then
-	./$1 $fileName output_"$(basename $1 .exe)".off > log_"$(basename $1 .exe)".txt
-	tail -n1 log_"$(basename $1 .exe)".txt
+	exe=${1//\//\\}
+	fileName=${fileName//\//\\}
+	command="start \"\""
+	command="$command$exe"
+	command="$command $fileName"
+	command="$command\"\""
+	echo $command
+	$command
+	# echo "$1 $fileName output_\"$(basename $1 .exe)\".off > log_\"$(basename $1 .exe)\".txt"
+	# tail -n1 log_"$(basename $1 .exe)".txt
 else
-	./$1 $fileName output_$1.off > log_$1.txt
-	tail -n1 log_$1.txt
+	# rm massif.out
+	# valgrind --tool=callgrind ./$1 $fileName output_$1.off
+	# valgrind --tool=massif --massif-out-file=massif.out ./$1 $fileName output_$1.off
+	time ./$1 $fileName output_$1.off > log_$1.txt
+	# tail -n1 log_$1.txt
+
 fi

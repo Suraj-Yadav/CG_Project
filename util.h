@@ -2,14 +2,13 @@
 #define UTIL_H
 
 #ifdef __linux__
-	#include <bits/stdc++.h>
+#include <bits/stdc++.h>
 #elif _WIN32
-	#include <fstream>
-	#include <atomic>
-	#include <thread>
-	#include <queue>
+#include <fstream>
+#include <atomic>
+#include <thread>
+#include <queue>
 #endif
-
 
 // Uncovering some classes from std
 using std::vector;
@@ -26,24 +25,28 @@ using std::make_pair;
 
 #define val(x) #x "=", x
 
+// #define ENABLE_STEP_MODEL 1
+// #define ENABLE_LOG 1
+#ifdef ENABLE_LOG
+#define print(...) debug_print(__VA_ARGS__)
+#define println(...)              \
+	{                             \
+		debug_print(__VA_ARGS__); \
+		std::cout << "\n";        \
+	}
+#else
+#define print(os, ...) ;
+#define println(os, ...) ;
+#endif
+
 #define fprint(os, ...) ;
 #define fprintln(os, ...) ;
-// #define print(os, ...) ;
-// #define println(os, ...) ;
-
 // #define fprint(os, ...) debug_print(os, __VA_ARGS__)
 // #define fprintln(os, ...)             \
 // 	{                                 \
 // 		debug_print(os, __VA_ARGS__); \
 // 		os << '\n';                   \
 // 	}
-
-#define print(...) debug_print(__VA_ARGS__)
-#define println(...)              \
-	{                             \
-		debug_print(__VA_ARGS__); \
-		std::cout << std::endl;   \
-	}
 
 void debug_print() {
 }
@@ -64,6 +67,31 @@ int getIndex(const std::vector<T> &v, const T &elem) {
 }
 
 template <class T>
+bool contains(const std::vector<T> &v, const T &elem) {
+	return std::binary_search(v.begin(), v.end(), elem);
+}
+template <class T>
+bool contains(const std::set<T> &s, const T &elem) {
+	return s.find(elem) != s.end();
+}
+
+template <class T>
+typename std::list<T>::iterator nextIterator(const std::list<T> &list, typename std::list<T>::iterator &itr) {
+	auto ret = std::next(itr);
+	if (ret == list.end())
+		ret = std::next(ret);
+	return ret;
+}
+
+template <class T>
+typename std::list<T>::iterator prevIterator(const std::list<T> &list, typename std::list<T>::iterator &itr) {
+	auto ret = std::prev(itr);
+	if (ret == list.end())
+		ret = std::prev(ret);
+	return ret;
+}
+
+template <class T>
 void deleteFromVector(std::vector<T> &v, const T &elem) {
 	auto itr = std::find(v.begin(), v.end(), elem);
 	if (itr != v.end())
@@ -75,6 +103,7 @@ void sortAndRemoveDuplicate(std::vector<T> &v) {
 	std::sort(v.begin(), v.end());			// vector may have repeated elements like 1 1 2 2 3 3 3 4 4 5 5 6 7
 	auto last = unique(v.begin(), v.end()); // vector now holds {1 2 3 4 5 6 7 x x x x x x}, where 'x' is indeterminate
 	v.erase(last, v.end());
+	v.shrink_to_fit();
 }
 
 template <typename T, typename T2>
@@ -144,6 +173,11 @@ class ourFace {
 
   public:
 	ourFace(int a, int b, int c) : data{a, b, c} {
+		if (data[0] > data[1]) std::swap(data[0], data[1]);
+		if (data[1] > data[2]) std::swap(data[1], data[2]);
+		if (data[0] > data[1]) std::swap(data[0], data[1]);
+	}
+	ourFace(ourEdge e, int p) : data{e[0], e[1], p} {
 		if (data[0] > data[1]) std::swap(data[0], data[1]);
 		if (data[1] > data[2]) std::swap(data[1], data[2]);
 		if (data[0] > data[1]) std::swap(data[0], data[1]);
