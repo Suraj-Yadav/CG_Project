@@ -76,20 +76,19 @@ class progress_bar {
 };
 
 class SurfaceReconstruct {
-	vector<Point3D> pts;
-	vector<Kernel::FT> maxLength;
-	DT3 dt;
-	bool valid;
-	vector<ourEdge> initialEdges;
-	set<ourFace> possibleFaces;
-	set<pair<Kernel::FT, ourEdge>> possibleEdges;
-	set<ourEdge> modelEdges;
-	set<ourFace> modelFaces;
-	map<ourEdge, vector<int>> edgeDegree;
-	vector<set<int>> currAdjList;
-	Kernel::FT maxEdge;
-	// Kernel::FT maxMinRatio;
-	vector<vector<set<ourEdge>::iterator>> vertAdjEdges;
+	vector<Point3D> pts;								 // set of distinct points
+	vector<Kernel::FT> maxLength;						 // stores length max incident edge on the vertex i
+	DT3 dt;												 // Delaunay Triangulation
+	bool valid;											 // Validity of Delaunay Triangulation/surface
+	vector<ourEdge> initialEdges;						 // MST edges
+	set<ourFace> possibleFaces;							 // All Delaunay Faces
+	set<pair<Kernel::FT, ourEdge>> possibleEdges;		 // All Delaunay edges - (modelEdges + initialEdges) sorted by length
+	set<ourEdge> modelEdges;							 // Current edges on the surface
+	set<ourFace> modelFaces;							 // Current faces on the surface
+	map<ourEdge, vector<int>> edgeDegree;				 // set of vertices that form face with edge e
+	vector<set<int>> currAdjList;						 // Adjacency list of the current surface
+	Kernel::FT maxEdge;									 // Lengeth of maximum edge in MST
+	vector<vector<set<ourEdge>::iterator>> vertAdjEdges; // set of edges that form face with vertex i
 
 	vector<ourEdge> getMstEdges() {
 		vector<CGAL::Union_find<int>::handle> handle;
@@ -489,7 +488,7 @@ class SurfaceReconstruct {
 
 	set<ourEdge> fillHoles(set<int> &leftVerts, map<int, set<int>> &tempAdjList) {
 		set<ourEdge> newEdges;
-
+		
 		if (leftVerts.size() == 3) {
 			int p[3], i = 0;
 			for (auto &elem : leftVerts) {
@@ -567,11 +566,11 @@ class SurfaceReconstruct {
 	}
 
 	void reconstruct() {
+
 		currAdjList = getAdjList(pts.size(), initialEdges);
 		set<ourEdge> origEdges(initialEdges.begin(), initialEdges.end());
 
 		maxEdge = 0;
-		// maxMinRatio = 1;
 
 		println(val(initialEdges.size()));
 
@@ -585,85 +584,39 @@ class SurfaceReconstruct {
 		set<std::tuple<Kernel::FT, ourEdge, int>,
 			std::greater<std::tuple<Kernel::FT, ourEdge, int>>>
 			pq, nextPQ;
-		// modelEdges.insert(initialEdges.begin(), initialEdges.end());
+
 		int edgeCondition = 2;
-		// for (auto &elem : pq) {
-		// 	cout << "[" << get<0>(elem) << " " << get<1>(elem) << " " <<
-		// get<2>(elem) << "],\n";
-		// }
-		// cout << "\n";
 		set<ourEdge> nextEdges;
 		bool changed = true;
 		int tempModelCount = 1;
 
 		while (changed) {
 			changed = false;
-			// Validity Check
-			// for (auto &face : modelFaces) {
-			// 	if (modelEdges.find(ourEdge(face[0], face[1])) == modelEdges.end()) {
-			// 		println("Validity Check", face, 0, 1);
-			// 		exit(0);
-			// 	}
-			// 	if (modelEdges.find(ourEdge(face[1], face[2])) == modelEdges.end()) {
-			// 		println("Validity Check", face, 1, 2);
-			// 		exit(0);
-			// 	}
-			// 	if (modelEdges.find(ourEdge(face[0], face[2])) == modelEdges.end()) {
-			// 		println("Validity Check", face, 0, 2);
-			// 		exit(0);
-			// 	}
-			// }
 
 			map<int, bool> leftVerts;
 			map<int, set<int>> tempAdjList;
 
 			for (auto &elem : modelEdges) {
-				// print(elem, ":");
-				// for (auto &point : edgeDegree[elem]) {
-				// 	print(point);
-				// }
-				// println();
+
 				if (edgeDegree[elem].size() == 1) {
 					leftVerts.insert({elem[0], false});
 					leftVerts.insert({elem[1], false});
-
-					// leftVerts.insert(elem[0]);
-					// leftVerts.insert(elem[1]);
 
 					tempAdjList[elem[0]].insert(elem[1]);
 					tempAdjList[elem[1]].insert(elem[0]);
 				}
 			}
 			for (auto &elem : origEdges) {
-				// print(elem, ":");
-				// for (auto &point : edgeDegree[elem]) {
-				// 	print(point);
-				// }
-				// println();
+
 				if (edgeDegree[elem].size() <= 1) {
 					leftVerts.insert({elem[0], false});
 					leftVerts.insert({elem[1], false});
 					tempAdjList[elem[0]].insert(elem[1]);
 					tempAdjList[elem[1]].insert(elem[0]);
 				}
-
-				// leftVerts.insert(elem[0]);
-				// leftVerts.insert(elem[1]);
 			}
-			// println();
+
 			println(val(leftVerts.size()));
-			// cout << "leftVerts=" << leftVerts.size() << "\n";
-			// for (auto &elem : leftVerts) {
-			// 	print("(", elem.first, elem.second, "),");
-			// }
-			// println();
-			// for (auto &elem : tempAdjList) {
-			// 	print(elem.first, ":");
-			// 	for (auto &v : elem.second) {
-			// 		print(v);
-			// 	}
-			// 	println();
-			// }
 
 			print("Size Change", possibleEdges.size());
 			if (leftVerts.size()) {
@@ -722,12 +675,6 @@ class SurfaceReconstruct {
 				println("Hole Edges =", E.size());
 				nextEdges.insert(E.begin(), E.end());
 			}
-
-// println("nextEdges Start");
-// for (auto &elem : nextEdges) {
-// 	println(elem);
-// }
-// println("nextEdges End");
 
 #ifdef ENABLE_STEP_MODEL
 			println("Generated tempMod" + std::to_string(tempModelCount) + ".off");
@@ -1117,25 +1064,22 @@ class SurfaceReconstruct {
 		std::ifstream inputFile(inputFilePath);
 
 		auto start = std::chrono::high_resolution_clock::now();
+
 		if (!CGAL::read_xyz_points(
 				inputFile, back_inserter(pts))) { // output iterator over points
 			cerr << "Error: cannot read file.";
 			return;
 		}
 
-		// for (auto &elem : pts) {
-		// 	elem = Point3D(100.0 * elem.x(), 100.0 * elem.y(), 100.0 * elem.z());
-		// }
-
 		sortAndRemoveDuplicate(pts);
 		pts.shrink_to_fit();
-
-		maxLength.resize(pts.size(), 0);
 
 		auto finish = std::chrono::high_resolution_clock::now();
 		cout << pts.size() << " points read in "
 			 << std::chrono::duration<double>(finish - start).count() << " secs"
 			 << std::endl;
+
+		// ###--> Create Delaunay triangulation and check Validity
 
 		start = std::chrono::high_resolution_clock::now();
 		dt.insert(pts.begin(), pts.end());
@@ -1157,8 +1101,12 @@ class SurfaceReconstruct {
 
 		valid = true;
 
+		// ###--> DONE
+
+		maxLength.resize(pts.size(), 0);
 		vertAdjEdges.resize(pts.size());
 
+		// ###--> Populate possibleFaces
 		for (auto faceItr = dt.finite_facets_begin(); faceItr != dt.finite_facets_end(); faceItr++) {
 			Triangle3D tri = dt.triangle(*faceItr);
 			possibleFaces.insert(ourFace(getIndex(pts, tri[0]),
@@ -1166,19 +1114,23 @@ class SurfaceReconstruct {
 										 getIndex(pts, tri[2])));
 		}
 
+		// ###--> Populate possibleEdges
 		for (auto edgeItr = dt.finite_edges_begin(); edgeItr != dt.finite_edges_end(); edgeItr++) {
 			Segment3D segment = dt.segment(*edgeItr);
 			ourEdge edge(getIndex(pts, segment[0]), getIndex(pts, segment[1]));
 			possibleEdges.insert(make_pair(segment.squared_length(), edge));
 		}
 
+		// ###--> Create MST
 		start = std::chrono::high_resolution_clock::now();
 		initialEdges = getMstEdges();
 		finish = std::chrono::high_resolution_clock::now();
 		cout << "MST created in "
 			 << std::chrono::duration<double>(finish - start).count() << " secs"
 			 << std::endl;
+		// ###--> DONE
 
+		// ###--> Populate maxLength from initialEdges
 		for (auto &edge : initialEdges) {
 			maxLength[edge[0]] =
 				std::max(maxLength[edge[0]], sqDist(pts[edge[0]], pts[edge[1]]));
@@ -1192,21 +1144,14 @@ class SurfaceReconstruct {
 		modelEdges.clear();
 
 		sortAndRemoveDuplicate(initialEdges);
-		// modelEdges.insert(initialEdges.begin(), initialEdges.end());
+
+		// ###--> reconstruct surface
 		reconstruct();
 
+		// ###--> fill Holes if present
 		postProcess();
 
-		// for (auto itr = .begin(); itr != modelFaces.end();) {
-		// 	if (!isLocked(*itr))
-		// 		cout << *itr << "\n";
-		// 	// 		itr = modelFaces.erase(itr);
-		// 	// 	else
-		// 	++itr;
-		// }
-
 		modelEdges.clear();
-		// modelEdges.insert(initialEdges.begin(), initialEdges.end());
 
 		finish = std::chrono::high_resolution_clock::now();
 		cout << std::endl
@@ -1252,7 +1197,7 @@ int main(int argc, char *argv[]) {
 	cout << std::boolalpha;
 
 	SurfaceReconstruct surface(argv[1]);
-	// SurfaceReconstruct surface("/home/newteam/Desktop/CG_Project/input_3D/Sphere.xyz");
+
 	if (surface.isValid()) {
 		surface.writeModel(argv[2]);
 	}

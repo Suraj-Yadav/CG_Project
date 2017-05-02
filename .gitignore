@@ -38,5 +38,6 @@ Thumbs.db
 
 # Folders #
 ###########
+.vs/
 .vscode/
 build/

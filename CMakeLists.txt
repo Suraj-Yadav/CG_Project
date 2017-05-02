@@ -34,14 +34,14 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 	set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# Intersection.cpp
-	#-----------------------------------
-		add_executable( Intersection Intersection.cpp )
-		set_property(TARGET Intersection PROPERTY CXX_STANDARD 14)
-		set_property(TARGET Intersection PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(Intersection ${CGAL_LIBRARIES})
-		set_target_properties( Intersection PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # Intersection.cpp
+	# #-----------------------------------
+	# 	add_executable( Intersection Intersection.cpp )
+	# 	set_property(TARGET Intersection PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET Intersection PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(Intersection ${CGAL_LIBRARIES})
+	# 	set_target_properties( Intersection PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
 		
 	# #-----------------------------------
@@ -53,23 +53,23 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 	# 	target_link_libraries(test2D ${CGAL_LIBRARIES})
 	# 	set_target_properties( test2D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 		
-	#-----------------------------------
-	# test3D.cpp
-	#-----------------------------------
-		add_executable( test3D test3D.cpp util.h)
-		set_property(TARGET test3D PROPERTY CXX_STANDARD 14)
-		set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(test3D ${CGAL_LIBRARIES})
-		set_target_properties( test3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # test3D.cpp
+	# #-----------------------------------
+	# 	add_executable( test3D test3D.cpp util.h)
+	# 	set_property(TARGET test3D PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET test3D PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(test3D ${CGAL_LIBRARIES})
+	# 	set_target_properties( test3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# test3DwithPost.cpp
-	#-----------------------------------
-		add_executable( test3DwithPost test3DwithPost.cpp util.h)
-		set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD 14)
-		set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(test3DwithPost ${CGAL_LIBRARIES})
-		set_target_properties( test3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # test3DwithPost.cpp
+	# #-----------------------------------
+	# 	add_executable( test3DwithPost test3DwithPost.cpp util.h)
+	# 	set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET test3DwithPost PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(test3DwithPost ${CGAL_LIBRARIES})
+	# 	set_target_properties( test3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 	#-----------------------------------
 	# stest3DwithPost.cpp
@@ -79,6 +79,15 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		set_property(TARGET stest3DwithPost PROPERTY CXX_STANDARD_REQUIRED ON)
 		target_link_libraries(stest3DwithPost ${CGAL_LIBRARIES})
 		set_target_properties( stest3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+
+	#-----------------------------------
+	# boolOp.cpp
+	#-----------------------------------
+		add_executable( boolOp boolOp.cpp)
+		set_property(TARGET boolOp PROPERTY CXX_STANDARD 14)
+		set_property(TARGET boolOp PROPERTY CXX_STANDARD_REQUIRED ON)
+		target_link_libraries(boolOp ${CGAL_LIBRARIES})
+		set_target_properties( boolOp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 	# #-----------------------------------
 	# # surface3D.cpp
