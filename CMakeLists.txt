@@ -80,14 +80,14 @@ if (CGAL_FOUND) # AND Qt5_FOUND AND OPENGL_FOUND AND QGLVIEWER_FOUND )
 		target_link_libraries(stest3DwithPost ${CGAL_LIBRARIES})
 		set_target_properties( stest3DwithPost PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
-	#-----------------------------------
-	# boolOp.cpp
-	#-----------------------------------
-		add_executable( boolOp boolOp.cpp)
-		set_property(TARGET boolOp PROPERTY CXX_STANDARD 14)
-		set_property(TARGET boolOp PROPERTY CXX_STANDARD_REQUIRED ON)
-		target_link_libraries(boolOp ${CGAL_LIBRARIES})
-		set_target_properties( boolOp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+	# #-----------------------------------
+	# # boolOp.cpp
+	# #-----------------------------------
+	# 	add_executable( boolOp boolOp.cpp)
+	# 	set_property(TARGET boolOp PROPERTY CXX_STANDARD 14)
+	# 	set_property(TARGET boolOp PROPERTY CXX_STANDARD_REQUIRED ON)
+	# 	target_link_libraries(boolOp ${CGAL_LIBRARIES})
+	# 	set_target_properties( boolOp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 	# #-----------------------------------
 	# # surface3D.cpp

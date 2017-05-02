@@ -19,6 +19,17 @@ typedef CGAL::Delaunay_triangulation_3<Kernel> DT3;
 
 const Kernel::FT inf = std::numeric_limits<Kernel::FT>::infinity();
 
+/// @file
+/// @brief This file is marvelous.
+
+/////////////////////////////////////////////////
+/// \brief
+/// Generates adjacency list from given Edges.
+/// \param[in] pointsCount int  Number of points.
+/// \param[in] edges const vector<ourEdge>& The edges.
+/// \return vector<set<int>> Adjacency List
+///
+/////////////////////////////////////////////////
 vector<set<int>> getAdjList(int pointsCount, const vector<ourEdge> &edges) {
 	vector<set<int>> adjList(pointsCount);
 	for (auto &edge : edges) {
@@ -27,9 +38,11 @@ vector<set<int>> getAdjList(int pointsCount, const vector<ourEdge> &edges) {
 	}
 	return adjList;
 }
-
 float progress = 0;
 
+/////////////////////////////////////////////////
+/// \brief Implements a Progress bar which runs in a separate thread.
+/////////////////////////////////////////////////
 class progress_bar {
 	std::atomic<bool> finished;
 	std::thread t;
@@ -37,8 +50,14 @@ class progress_bar {
   public:
 	progress_bar()
 		: finished(false), t(std::ref(*this)) {
-	}					// initiate the bar by starting a new thread
-	void operator()() { // function executed by the thread
+	}
+	/////////////////////////////////////////////////
+	/// \brief
+	/// initiate the bar by starting a new thread
+	/// \return void
+	///
+	/////////////////////////////////////////////////
+	void operator()() {
 		int barWidth = 70;
 		while (!finished) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -56,7 +75,13 @@ class progress_bar {
 			cerr.flush();
 		}
 	}
-	void terminate() { // tell the thread/bar to stop
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Stop the thread
+	/// \return void
+	///
+	/////////////////////////////////////////////////
+	void terminate() {
 		finished = true;
 		if (t.joinable())
 			t.join();
@@ -75,21 +100,30 @@ class progress_bar {
 	}
 };
 
+/////////////////////////////////////////////////
+/// \brief Contains the Reconstructed Surface
+/////////////////////////////////////////////////
 class SurfaceReconstruct {
-	vector<Point3D> pts;								 // set of distinct points
-	vector<Kernel::FT> maxLength;						 // stores length max incident edge on the vertex i
-	DT3 dt;												 // Delaunay Triangulation
-	bool valid;											 // Validity of Delaunay Triangulation/surface
-	vector<ourEdge> initialEdges;						 // MST edges
-	set<ourFace> possibleFaces;							 // All Delaunay Faces
-	set<pair<Kernel::FT, ourEdge>> possibleEdges;		 // All Delaunay edges - (modelEdges + initialEdges) sorted by length
-	set<ourEdge> modelEdges;							 // Current edges on the surface
-	set<ourFace> modelFaces;							 // Current faces on the surface
-	map<ourEdge, vector<int>> edgeDegree;				 // set of vertices that form face with edge e
-	vector<set<int>> currAdjList;						 // Adjacency list of the current surface
-	Kernel::FT maxEdge;									 // Lengeth of maximum edge in MST
-	vector<vector<set<ourEdge>::iterator>> vertAdjEdges; // set of edges that form face with vertex i
+	vector<Point3D> pts;								 ///< set of distinct points
+	vector<Kernel::FT> maxLength;						 ///< stores length max incident edge on the vertex i
+	DT3 dt;												 ///< Delaunay Triangulation
+	bool valid;											 ///< Validity of Delaunay Triangulation/surface
+	vector<ourEdge> initialEdges;						 ///< MST edges
+	set<ourFace> possibleFaces;							 ///< All Delaunay Faces
+	set<pair<Kernel::FT, ourEdge>> possibleEdges;		 ///< All Delaunay edges - (modelEdges + initialEdges) sorted by length
+	set<ourEdge> modelEdges;							 ///< Current edges on the surface
+	set<ourFace> modelFaces;							 ///< Current faces on the surface
+	map<ourEdge, vector<int>> edgeDegree;				 ///< set of vertices that form face with edge e
+	vector<set<int>> currAdjList;						 ///< Adjacency list of the current surface
+	Kernel::FT maxEdge;									 ///< Length of maximum edge in MST
+	vector<vector<set<ourEdge>::iterator>> vertAdjEdges; ///< set of edges that form face with vertex i
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Computes the MST edges from the possibleEdges
+	/// \return vector<ourEdge> MST edges
+	///
+	/////////////////////////////////////////////////
 	vector<ourEdge> getMstEdges() {
 		vector<CGAL::Union_find<int>::handle> handle;
 		CGAL::Union_find<int> uf;
@@ -112,14 +146,27 @@ class SurfaceReconstruct {
 		}
 
 		std::sort(mst.begin(), mst.end());
-
 		return mst;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Determines whether  \p face is a Delaunay Face
+	/// \param face const ourFace& Input Face
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	inline bool isFaceDelaunay(const ourFace &face) {
 		return possibleFaces.find(face) != possibleFaces.end();
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Returns the score (cosine of the maximum angle) of Triangle.
+	/// \param u, v, w int indexes of vertex of Triangle
+	/// \return Kernel::FT  score
+	///
+	/////////////////////////////////////////////////
 	Kernel::FT getTriScore(int u, int v, int w) {
 		Point3D a = pts[u], b = pts[v], c = pts[w];
 		Vector3D AB(a, b), AC(a, c), BC(b, c);
@@ -135,6 +182,15 @@ class SurfaceReconstruct {
 		return score[0];
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	///
+	/// \param u int
+	/// \param v int
+	/// \param w int
+	/// \return Kernel::FT
+	///
+	/////////////////////////////////////////////////
 	Kernel::FT getMaxAngle(int u, int v, int w) {
 		Point3D a = pts[u], b = pts[v], c = pts[w];
 		Vector3D AB(a, b), AC(a, c), BC(b, c);
@@ -146,6 +202,14 @@ class SurfaceReconstruct {
 		score = std::min(-AB * BC, score);
 		return score;
 	}
+
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Returns cosine of the angle \p uvw
+	/// \param u, v, w int indexes of vertex of Triangle
+	/// \return Kernel::FT
+	///
+	/////////////////////////////////////////////////
 	Kernel::FT getAngle(int u, int v, int w) {
 		Point3D a = pts[u], b = pts[v], c = pts[w];
 		Vector3D AB(a, b), BC(b, c);
@@ -154,6 +218,12 @@ class SurfaceReconstruct {
 		return -AB * BC;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Add \p face to the mesh and updates the auxiliary data structures of object.
+	/// \return void
+	///
+	/////////////////////////////////////////////////
 	void addFaceToModel(ourFace face) {
 		ourEdge e1(face[0], face[1]), e2(face[0], face[2]), e3(face[1], face[2]);
 		int p1 = face[2], p2 = face[1], p3 = face[0];
@@ -192,6 +262,12 @@ class SurfaceReconstruct {
 		vertAdjEdges[p3].push_back(modelEdges.find(e3));
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Remove \p face to the mesh and updates the auxiliary data structures of object.
+	/// \return void
+	///
+	/////////////////////////////////////////////////
 	void removeFace(ourEdge edge, int remove) {
 		ourEdge edge1(ourEdge(edge[0], remove)), edge0(ourEdge(edge[1], remove));
 
@@ -216,24 +292,22 @@ class SurfaceReconstruct {
 		}
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Count the number of edges in Triangle \p abc with length <= \p length
+	/// \param a,b,c Point3D Vertices of Triangle
+	/// \param length Kernel::FT
+	/// \return int
+	///
+	/////////////////////////////////////////////////
 	static int testEdges(Point3D a, Point3D b, Point3D c, Kernel::FT length) {
 		int ans = 0;
-		// Kernel::FT maxiLength =
-		// 			   std::max(std::max(sqDist(a, b), sqDist(b, c)), sqDist(a, c)),
-		// 		   miniLength =
-		// 			   std::min(std::min(sqDist(a, b), sqDist(b, c)), sqDist(a, c));
 		if (sqDist(a, b) <= length)
 			ans++;
 		if (sqDist(a, c) <= length)
 			ans++;
 		if (sqDist(c, b) <= length)
 			ans++;
-		// if (maxiLength < (4 * miniLength * maxMinRatio)) {
-		// 	maxMinRatio = std::max(maxMinRatio, maxiLength / miniLength);
-		// }
-		// else {
-		// 	ans = -10;
-		// }
 		return ans;
 	}
 
@@ -247,6 +321,13 @@ class SurfaceReconstruct {
 									  e));
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Generate all possible Delaunay Triangles with their score adjacent to \p edge
+	/// \param edge const ourEdge&
+	/// \return vector<pair<int, Kernel::FT>>
+	///
+	/////////////////////////////////////////////////
 	vector<pair<int, Kernel::FT>> getFacesFromEdge(const ourEdge &edge) {
 		vector<pair<int, Kernel::FT>> elems;
 		// set<int> t, f;
@@ -313,6 +394,13 @@ class SurfaceReconstruct {
 	// return false;
 	// }
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Check if \p face is surrounded by Triangles on all side
+	/// \param face ourFace
+	/// \return int
+	///
+	/////////////////////////////////////////////////
 	int lockedLevel(ourFace face) {
 		int count = 0;
 		for (int i = 0; i < 3; ++i) {
@@ -322,6 +410,13 @@ class SurfaceReconstruct {
 		return count;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Check if Segment \p OC projects on Triangle \p ABO
+	/// \param A, B, O, C int indexes
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	bool testProjection(int A, int B, int O, int C) {
 		Point3D a = pts[A], b = pts[B], o = pts[O];
 		Plane3D plane(a, b, o);
@@ -332,6 +427,12 @@ class SurfaceReconstruct {
 		return d1 > 0 && d2 > 0;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Check if face formed by \p e and \p point overlaps with any face or edge at a distance <= 2.
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	bool isFaceOverlap(const ourEdge &e, int point, set<ourFace> excludeSet = set<ourFace>(),
 					   set<ourEdge> excludeEdge = set<ourEdge>()) {
 		bool ret = isEdgeOverlap(e, excludeSet);
@@ -394,6 +495,12 @@ class SurfaceReconstruct {
 		return false;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Check if \p e any adjacent face.
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	bool isEdgeOverlap(const ourEdge &e, set<ourFace> excludeSet = set<ourFace>()) {
 		ourEdge edge(0, 1);
 		for (int i = 0; i < 2; ++i) {
@@ -414,6 +521,15 @@ class SurfaceReconstruct {
 		return false;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Check if the face formed by \p edge and \p newPoint can be added to Surface, with or without removing an existing face.
+	/// \param[in] edge ourEdge
+	/// \param[in] newPoint int
+	/// \param[in,out] toBeRemoved int&
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	bool validToAdd(ourEdge edge, int newPoint, int &toBeRemoved) {
 		auto &edgeDeg = edgeDegree[edge];
 		println(edge, newPoint, edgeDeg.size());
@@ -486,9 +602,17 @@ class SurfaceReconstruct {
 		// return norm1 * norm2 >= 0.707106781187;
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Generate Stitch Edges
+	/// \param leftVerts set<int>&
+	/// \param tempAdjList map<int, set<int>>&
+	/// \return set<ourEdge>
+	///
+	/////////////////////////////////////////////////
 	set<ourEdge> fillHoles(set<int> &leftVerts, map<int, set<int>> &tempAdjList) {
 		set<ourEdge> newEdges;
-		
+
 		if (leftVerts.size() == 3) {
 			int p[3], i = 0;
 			for (auto &elem : leftVerts) {
@@ -565,6 +689,12 @@ class SurfaceReconstruct {
 		currAdjList[v].erase(u);
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Main Reconstruction Function
+	/// \return void
+	///
+	/////////////////////////////////////////////////
 	void reconstruct() {
 
 		currAdjList = getAdjList(pts.size(), initialEdges);
@@ -945,6 +1075,12 @@ class SurfaceReconstruct {
 		}
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Perform Post Processing on th Surface
+	/// \return void
+	///
+	/////////////////////////////////////////////////
 	void postProcess() {
 		println("Doing Post Processing");
 
@@ -1060,6 +1196,13 @@ class SurfaceReconstruct {
 	}
 
   public:
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Opens the file \p inputFilePath and generate the Surface Reconstruction
+	/// \param inputFilePath const char *
+	/// \return
+	///
+	/////////////////////////////////////////////////
 	SurfaceReconstruct(const char *inputFilePath) {
 		std::ifstream inputFile(inputFilePath);
 
@@ -1169,8 +1312,21 @@ class SurfaceReconstruct {
 		}
 	}
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Return if the Surface Reconstruction is valid or not. Reconstruction is Invalid only if a Delaunay can;t be created from the input Point Set.
+	/// \return bool
+	///
+	/////////////////////////////////////////////////
 	bool isValid() { return valid; }
 
+	/////////////////////////////////////////////////
+	/// \brief
+	/// Write the Surface Constructed in \p outputFilePath in OFF File Format
+	/// \param outputFilePath std::string
+	/// \return void
+	///
+	/////////////////////////////////////////////////
 	void writeModel(std::string outputFilePath) {
 		std::ofstream outputFile(outputFilePath);
 		outputFile << "OFF\n";
